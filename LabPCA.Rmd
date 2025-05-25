@@ -1,0 +1,414 @@
+---
+title: "Lab ACP"
+author: 
+  - Edwin Sanchez
+  - Stephanie Tamayo
+  - Andres Felipe Torres
+  - Fredy Urrea
+  - Sergio Velasquez
+  - Manuel Espitia
+output:
+  pdf_document:
+    latex_engine: xelatex
+    keep_tex: true
+date: "2025-05-18"
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduccion
+
+Carga de achivos, organizacion de los datos y renombrar variables
+
+```{r cars, results='hide',message = FALSE, warning=FALSE, }
+setwd("C:/Users/pipet/Downloads")
+getwd()
+library("FactoMineR")
+library("dplyr")
+library("kableExtra")
+
+CIUDADES <- readxl::read_excel("ciudades original-filtrado-con etiquetas (1).xlsx",
+                               sheet = 1)
+RHINT <- CIUDADES[,c("CIUDADES","RH_1","RH_2","RH_5","RH_6","RH_7","RH_8","RH_9",
+                     "RH_10","RH_11","RH_12","RH_13","RH_14","RH_15","RH_16","INT_66",
+                     "INT_67",
+                     "INT_68","INT_69","INT_70")]
+#RHINT
+colnames(RHINT)[2:20] <- c("PC", "TCP","AA","CBPS","CBES","RAP","CC","CPT","CS","MI","DCFS"
+                           ,"VI","H","S","BCPIB","CI","TOE","DP","DM")
+
+```
+
+## Punto 3.
+
+Utilizar la funcion PCA del paquete FactoMiner para realizar un ACP de las variables de recursos humanos (RH) utilizando como ilustrativas las que le correspondieron al grupo
+
+
+### Carga de archivos  y ejecucion del ACP
+
+```{r pressure, results='hide', warning=FALSE, message=FALSE}
+
+# Estandrizacion y asiganacion de nombres de la filas
+
+RHINTce <- scale(RHINT[,2:20], scale = TRUE, center = TRUE)
+colnames(RHINTce) <- colnames(RHINT)[2:20]
+
+rownames(RHINTce) <- RHINT$CIUDADES
+
+require(FactoMineR)
+
+#ACP sin grafica
+pcaRHINTce <- PCA(RHINTce, quanti.sup = c(15:19), graph = F, ncp = 6)
+
+pcaRHINTce
+
+```
+### Valores propios y varianza explicada
+
+```{r valvar, echo=FALSE, warning=FALSE, results='asis'}
+# Tabla de valores propios y varianzas
+vp <- round(pcaRHINTce$eig, 4)
+
+# Crear tabla con kableExtra
+require(kableExtra)
+kable(vp, format = "latex", booktabs = TRUE,
+      caption = "Valores propios, porcentaje de varianza y varianza acumulada", 
+      label = "vprankis",
+      col.names = c("Valor propio", "% Varianza", "% Acumulado")) %>%
+  kable_styling(latex_options = c("scale_down", "hold_position")) %>%
+  row_spec(0, bold = TRUE)  # Encabezados en negrita
+```
+
+
+**Análisis de los valores propios y varianza explicada:**   
+
+Los resultados del ACP revelan que los primeros seis componentes presentan valores propios mayores a 1, explicando en conjunto el 85.25% de la varianza total. El primer componente principal captura el 25.51% de la variabilidad, mostrando la mayor influencia individual, mientras que los dos primeros componentes acumulan el 41.50%, lo que permite una representación bidimensional inicial aunque limitada. La inclusión progresiva de componentes hasta el sexto (85.25%) ofrece un equilibrio óptimo entre reducción dimensional y conservación de información. Sin embargo, alcanzar el 90% de varianza requeriría ocho componentes, indicando que la estructura subyacente de los datos está distribuida multidimensionalmente. Las cinco variables suplementarias, aunque no contribuyen al cálculo de la varianza, permitirán enriquecer la interpretación de estos componentes al analizar su proyección en el espacio factorial. Este comportamiento sugiere que, si bien es posible reducir significativamente la dimensionalidad, la complejidad de los datos exige considerar múltiples dimensiones para un análisis exhaustivo.
+   
+   
+\newpage   
+
+### Correlaciones variable factor
+
+```{r correlaciones variable factor, echo=FALSE, warning=FALSE, results='asis', fig.width=2, fig.height=2, fig.pos='H', out.width='70%'}
+#tabla latex correlaciones variable factor
+
+kable(
+  round(pcaRHINTce$var$cor[, 1:6], 4),  # Selección de 6 dimensiones
+  "latex",
+  booktabs = TRUE,
+  caption = "Correlaciones variables factor primeras 6 dimensiones",
+  label = "corvarfact"
+) %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+**Análisis de correlaciones variables-factor en las primeras seis dimensiones:**
+
+El análisis de las correlaciones revela patrones significativos en la estructura de los datos. En la Dimensión 1, la Tasa de Ocupación (0.904) y Tasa de Crecimiento Poblacional (0.819) muestran las correlaciones más altas, sugiriendo que este eje representa principalmente dinamismo económico y laboral. Contrariamente, la *Calidad de los Colegios (-0.671)* y *Cobertura en Educación Superior (-0.516)* presentan correlaciones negativas, indicando una posible tensión entre desarrollo urbano y calidad educativa. La Dimensión 2 está dominada por variables educativas (Cobertura Bruta en Educación Superior: 0.718) y demográficas (Población: 0.709), mientras que los *Secuestros (-0.632)* aparecen como contrapeso, reflejando un eje de "desarrollo vs. inseguridad". En la Dimensión 3, los Delitos contra la Formación Sexual (0.768) y Violencia Intrafamiliar (0.801) emergen como factores críticos, independientes de las dimensiones económicas. Las dimensiones restantes capturan relaciones más específicas: la Dimensión 4 asocia Secuestros (0.536) con variables educativas, la Dimensión 5 vincula Mortalidad Infantil (0.620) con Homicidios (0.688), y la Dimensión 6 muestra una fuerte correlación negativa entre *Cobertura en Salud (-0.759)* y otros factores.
+
+### Variables y objetos graficados en distintas dimensione
+
+```{r gravardim12, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Figura 1. Variables y ciudades en las Dimensiones 1 y 2", fig.align='center'}
+library(factoextra)
+library(gridExtra)
+library(grid)
+
+# Crear gráficos
+bipl1 <- fviz_pca_var(
+  pcaRHINTce,
+  label = "var",
+  col.var = "cos2",
+  gradient.cols = c("blue", "orange", "red"),
+  repel = TRUE,
+  title = "A) Variables",
+  labelsize = 3
+)
+
+bipl2 <- fviz_pca_ind(
+  pcaRHINTce,
+  label = "ind",
+  col.ind = "cos2",
+  gradient.cols = c("blue", "orange", "red"),
+  repel = TRUE,
+  title = "B) Ciudades (Individuos)",
+  labelsize = 3
+)
+
+# Combinar los gráficos en uno solo
+combined_plot <- gridExtra::arrangeGrob(bipl1, bipl2, nrow = 1)
+
+# Dibujar el gráfico con título (fig.cap funciona ahora)
+grid::grid.draw(combined_plot)
+
+
+
+```
+**Análisis de Relación entre variables y ciudades Dimesiones 1 y 2**
+
+El gráfico presenta la distribución de las variables activas y suplementarias, junto con la ubicación de las principales ciudades colombianas en las dos primeras dimensiones del ACP, que en conjunto explican el 41.5% de la varianza total.
+
+En la **Dimensión 1 (25.5% de varianza)**, observamos un claro contraste entre indicadores de desarrollo y problemáticas sociales. Las variables con mayor contribución positiva incluyen la cobertura en formación superior (CBF-S DM) y la relación alumno-profesor (RAP), asociadas principalmente a Bogotá y Medellín. En el extremo opuesto, los secuestros (S) aparecen vinculados a ciudades como Cúcuta y Riohacha. Las variables suplementarias, particularmente la balanza comercial/PIB (BCPIB), aunque con menor peso (cos² bajo), muestran una tendencia a alinearse con los indicadores de desarrollo económico.
+
+La **Dimensión 2 (16% de varianza)** revela una diferenciación adicional, donde la violencia intrafamiliar (VI) se ubica en la parte superior del gráfico, mientras que variables educativas ocupan la zona inferior. Ciudades intermedias como Pasto y Villavicencio se posicionan en zonas más centrales de este eje.
+
+**Principales hallazgos**:
+1. Las capitales principales (Bogotá, Medellín) muestran el mejor desempeño en indicadores clave de desarrollo
+2. Existe una marcada disparidad regional en seguridad y acceso a educación
+3. Las variables suplementarias, aunque con representación limitada, sugieren relaciones interesantes que merecen mayor exploración
+
+Este análisis evidencia la utilidad del ACP para identificar patrones territoriales y relaciones complejas entre múltiples indicadores socioeconómicos. La posición relativa de las variables suplementarias, en particular BCPIB y DM, ofrece valiosos insumos para investigaciones posteriores sobre los factores que impulsan el desarrollo regional.
+
+```{r grafvarobjdim34, echo=FALSE, message=FALSE, warning=FALSE, results='asis',fig.cap="Figura 1. Variables y ciudades en las Dimensiones 3 y 4"}
+# Cargar librerías
+library(factoextra)
+library(gridExtra)
+
+# Gráfico de variables (dimensiones 3 y 4)
+bipl1 <- fviz_pca_var(
+  pcaRHINTce,
+  axes = c(3, 4),             # <<< Aquí el cambio principal
+  label = "var",
+  col.var = "cos2",
+  gradient.cols = c("blue", "orange", "red"),
+  repel = TRUE,
+  title = "A) Variables (Dim.3 vs Dim.4)",
+  labelsize = 3
+)
+
+# Gráfico de individuos (dimensiones 3 y 4)
+bipl2 <- fviz_pca_ind(
+  pcaRHINTce,
+  axes = c(3, 4),             # <<< Aquí también
+  label = "ind",
+  col.ind = "cos2",
+  gradient.cols = c("blue", "orange", "red"),
+  repel = TRUE,
+  title = "B) Ciudades (Individuos - Dim.3 vs Dim.4)",
+  labelsize = 3
+)
+
+
+# Combinar los gráficos en uno solo
+combined_plot <- gridExtra::arrangeGrob(bipl1, bipl2, nrow = 1)
+
+# Dibujar el gráfico con título (fig.cap funciona ahora)
+grid::grid.draw(combined_plot)
+
+
+```
+
+
+**Análisis de Relación entre variables y ciudades Dimesiones 3 y 4:** El gráfico revela patrones complementarios a las dimensiones principales, donde la **Dimensión 3 (14.8% varianza)** contrasta cobertura en salud (CS) con problemáticas sociales (DCFS), mostrando que ciudades como Villavicencio y Pasto tienen mejores indicadores sanitarios, mientras Riohacha y Cúcuta presentan mayores desafíos. La **Dimensión 4 (11.4%)** distingue entre variables económicas (BCPIB, CBP/S) y de formación laboral (CPT), evidenciando que el desarrollo comercial no necesariamente se asocia a mejor capacitación. Bogotá muestra una posición intermedia en ambas dimensiones, destacando que su ventaja en indicadores globales no se repite en estos aspectos específicos. Las variables suplementarias (como BCPIB) confirman que esta dimensión captura dinámicas económicas regionales.
+
+```{r grafvarobjdim56, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Figura 4. Variables y ciudades en las Dimensiones 5 y 6", fig.align='center'}
+library(factoextra)
+library(ggpubr)
+
+# Crear gráficos
+bipl1 <- fviz_pca_var(
+  pcaRHINTce,
+  axes = c(5, 6),
+  label = "var",
+  col.var = "cos2",
+  gradient.cols = c("blue", "orange", "red"),
+  repel = TRUE,
+  title = "A) Variables (Dim.5 vs Dim.6)",
+  labelsize = 3
+)
+
+bipl2 <- fviz_pca_ind(
+  pcaRHINTce,
+  axes = c(5, 6),
+  label = "ind",
+  col.ind = "cos2",
+  gradient.cols = c("blue", "orange", "red"),
+  repel = TRUE,
+  title = "B) Ciudades (Individuos - Dim.5 vs Dim.6)",
+  labelsize = 3
+)
+
+# Usar ggarrange (que sí genera un objeto tipo ggplot válido para fig.cap)
+combined_plot <- ggpubr::ggarrange(bipl1, bipl2, nrow = 1)
+
+# Imprimir la figura para que fig.cap funcione
+print(combined_plot)
+
+```
+**Análisis de Relación entre variables y ciudades Dimesiones 5 y 6:** 
+
+En el plano definido por las dimensiones 5 (9%) y 6 (8.5%), se identifican asociaciones residuales entre variables sociales. La dimensión 5 muestra una oposición entre la cobertura en salud (CS), ubicada en el extremo negativo, y los homicidios (H) y mortalidad infantil (MT), más próximos al lado positivo. La dimensión 6 se vincula positivamente con capacitación para el trabajo (CPT) y delitos contra la formación sexual (DCFS), sugiriendo un eje relacionado con vulnerabilidades sociales y esfuerzos educativos. Las variables suplementarias de internacionalización tienen una baja contribución en estas dimensiones, aunque diversificación de productos (DP) y mercados (DM) se orientan ligeramente hacia la Dim.6. En cuanto a las ciudades, Bogotá D.C., Ibagué y Armenia destacan positivamente en Dim.6, mientras que Pasto, Cali, Cúcuta y Bucaramanga se proyectan hacia el cuadrante negativo, posiblemente por menores niveles de cobertura o mayores problemáticas sociales. Esta representación complementa los factores principales revelando patrones específicos de ciertas regiones.
+
+### Biplots
+
+```{r biplotdim12, echo=FALSE, warning=FALSE, fig.cap="Figura 4. Biplot: Variables y ciudades en las Dimensiones 1 y 2", fig.align='center'}
+print(
+  fviz_pca_biplot(pcaRHINTce,
+                  axes = c(1, 2),
+                  geom = c("point", "text"),
+                  col.ind = "cos2",
+                  gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+                  col.var = "contrib",
+                  alpha.var = "contrib",
+                  repel = TRUE,
+                  title = "Biplot ACP - Dimensiones 1 y 2",
+                  legend.title = list(
+                    cos2 = "Calidad de representación",
+                    contrib = "Contribución (%)"
+                  )) +
+    theme_minimal() +
+    theme(legend.position = "right")
+)
+```
+**Biplot Dimensiones 1 y 2**
+En el biplot correspondiente a las dimensiones 1 (25.5%) y 2 (16%), se observa una clara organización de las variables y ciudades que reflejan las principales fuentes de variabilidad en el análisis. La dimensión 1 diferencia a las ciudades con altos niveles de homicidios (H), mortalidad infantil (MI), y tasa de crecimiento poblacional (TCP) —como Riohacha y Arauca— ubicadas a la derecha, de aquellas con mayor cobertura en salud (CS), cobertura en educación superior (CBES), y balanza comercial/PIB (BCPIB), situadas a la izquierda. Por su parte, la dimensión 2 resalta a Bogotá D.C. y Medellín por sus altos niveles en calidad de colegios (CC) y cobertura en educación superior (CBES), contrastando con ciudades como San Andrés o Ibagué, que presentan valores negativos. Las variables suplementarias asociadas a la internacionalización (como el coeficiente de internacionalización - CI y la tasa de orientación exportadora - TOE) tienen también una orientación positiva sobre la Dim.2. Este gráfico revela patrones claros de agrupamiento regional y sugiere una estructura subyacente en torno a condiciones educativas, sociales y económicas diferenciadas entre las ciudades analizadas.
+
+
+
+```{r biplotdim34, echo=FALSE, warning=FALSE, results='asis',fig.cap="Figura 4. biplot Dimensiones 3 y 4"}
+#biplot
+#reprenstacion simulatane de universidades y variables
+
+fviz_pca_biplot(pcaRHINTce,
+                axes = c(3, 4),  # Ejes a visualizar (primera y segunda dimensión)
+                geom = c("point", "text"),  # Mostrar puntos y etiquetas
+                col.ind = "cos2",  # Color de individuos por calidad de representación
+                gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),  # Escala de colores
+                col.var = "contrib",  # Color de variables por contribución
+                alpha.var = "contrib",  # Transparencia según contribución
+                repel = TRUE,  # Evitar solapamiento de etiquetas
+                title = "Biplot ACP - Dimensiones 3 y 4",
+                legend.title = list(
+                  cos2 = "Calidad de representación",
+                  contrib = "Contribución (%)"
+                )) +
+  theme_minimal() +
+  theme(legend.position = "right")
+```
+
+**Biplot Dimensiones 3 y 4**
+El biplot de las dimensiones 3 y 4 revela información complementaria sobre la variabilidad entre ciudades, con énfasis en aspectos de violencia y educación. En la dimensión 3 destacan positivamente los delitos contra la formación sexual (DCFS) y la violencia intrafamiliar (VI), lo que sugiere que Bucaramanga se asocia en mayor medida con estos problemas sociales. En contraste, ciudades como Armenia, Cartago y Manizales aparecen en la parte baja de la Dim.3, relacionadas con menores niveles en estas variables. La cobertura bruta en primaria y secundaria (CBPS) también contribuye negativamente a esta dimensión, separando ciudades con mejor desempeño educativo. Por otro lado, la dimensión 4 muestra una ligera dispersión en variables como balanza comercial/PIB (BCPIB) y tasa de crecimiento poblacional (TCP), asociadas a Bogotá y Tunja. Llama la atención Villavicencio, que se aleja en el extremo superior derecho, aunque sin fuerte relación con alguna variable específica. En conjunto, este plano pone de relieve diferencias en fenómenos de violencia y desempeño educativo, ofreciendo claves importantes para entender las dinámicas sociales diferenciadas entre las ciudades.
+
+```{r biplotdim56, echo=FALSE, warning=FALSE, results='asis',fig.cap="Figura 4. biplot Dimensiones 5 y 6"}
+#biplot
+#reprenstacion simulatane de universidades y variables
+
+fviz_pca_biplot(pcaRHINTce,
+                axes = c(5, 6),  # Ejes a visualizar (primera y segunda dimensión)
+                geom = c("point", "text"),  # Mostrar puntos y etiquetas
+                col.ind = "cos2",  # Color de individuos por calidad de representación
+                gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),  # Escala de colores
+                col.var = "contrib",  # Color de variables por contribución
+                alpha.var = "contrib",  # Transparencia según contribución
+                repel = TRUE,  # Evitar solapamiento de etiquetas
+                title = "Biplot ACP - Dimensiones 5 y 6",
+                legend.title = list(
+                  cos2 = "Calidad de representación",
+                  contrib = "Contribución (%)"
+                )) +
+  theme_minimal() +
+  theme(legend.position = "right")
+```
+
+**Biplot Dimensiones 5 y 6**
+En el biplot de las dimensiones 5 y 6 se destacan principalmente variables asociadas a problemáticas de seguridad. La variable "Homicidios" (H) tiene una fuerte contribución positiva sobre la dimensión 5, y se encuentra relacionada especialmente con ciudades como Riohacha, Pereira y Cúcuta. En sentido opuesto, la variable "Secuestros" (S) tiene mayor peso negativo en la dimensión 6, aunque su impacto global es más moderado. Otras variables con menor pero significativa contribución en estas dimensiones incluyen la cobertura en salud (CS) y la calidad de los colegios (CC), aunque su dirección indica que su influencia es secundaria en este plano. Bogotá, D.C. y ciudades como Ibagué y Cartago se ubican en zonas más neutrales, con menor asociación directa con las variables proyectadas. En general, estas dimensiones permiten diferenciar a algunas ciudades con mayores niveles de violencia letal, en contraste con otras que presentan contextos menos afectados por estas problemáticas.
+
+### Cosenos cuadrados de los objetos con los factores
+
+
+```{r cos212, , echo=FALSE, warning=FALSE, results='asis'}
+# Crear un dataframe con todas las métricas
+var_coord <- as.data.frame(round(pcaRHINTce$var$coord, 4))
+var_contrib <- as.data.frame(round(pcaRHINTce$var$contrib, 2))
+var_cos2 <- as.data.frame(round(pcaRHINTce$var$cos2, 4))
+
+# Combinar solo las primeras 2 dimensiones
+var_results <- data.frame(
+  Variable = rownames(var_coord),
+  Coord_Dim1 = var_coord[,1],
+  Coord_Dim2 = var_coord[,2],
+  Contrib_Dim1 = var_contrib[,1],
+  Contrib_Dim2 = var_contrib[,2],
+  Cos2_Dim1 = var_cos2[,1],
+  Cos2_Dim2 = var_cos2[,2]
+)
+
+# Crear la tabla
+knitr::kable(var_results, "latex", booktabs = TRUE, 
+             caption = "Resultados del PCA: Coordenadas, Contribución y Calidad de Representación",
+             label = "pca_results") %>%
+  kableExtra::kable_styling(latex_options = c("striped", "scale_down", "hold_position"))
+
+```
+
+
+**Análisis de las Tablas de Coordenadas, Contribución y Calidad de Representación (cos2):**
+
+El análisis de las tablas 3, 4 y 5 revela la manera en que cada variable original contribuye y se proyecta sobre las dimensiones principales extraídas del Análisis de Componentes Principales (ACP).
+
+En las dimensiones 1 y 2 (tabla 3), destacan por su alta contribución el Analfabetismo Absoluto (AA) en la Dim1 (22.89%), la Cobertura bruta en educación superior (CBES) con una fuerte presencia en Dim2 (23.02%), y la Población de la ciudad (PC) también en Dim2 (22.44%). Esto indica que estas variables son las que más estructuran el espacio bidimensional inicial, y su posición en el biplot ofrece información importante sobre el agrupamiento y diferenciación de las ciudades.
+
+
+
+```{r cos234, , echo=FALSE, warning=FALSE, results='asis'}
+# Crear un dataframe con todas las métricas
+var_coord <- as.data.frame(round(pcaRHINTce$var$coord, 4))
+var_contrib <- as.data.frame(round(pcaRHINTce$var$contrib, 2))
+var_cos2 <- as.data.frame(round(pcaRHINTce$var$cos2, 4))
+
+# Combinar solo las primeras 2 dimensiones
+var_results <- data.frame(
+  Variable = rownames(var_coord),
+  Coord_Dim3 = var_coord[,3],
+  Coord_Dim4 = var_coord[,4],
+  Contrib_Dim3 = var_contrib[,3],
+  Contrib_Dim4 = var_contrib[,4],
+  Cos2_Dim3 = var_cos2[,3],
+  Cos2_Dim4 = var_cos2[,4]
+)
+
+# Crear la tabla
+knitr::kable(var_results, "latex", booktabs = TRUE, 
+             caption = "Resultados del PCA: Coordenadas, Contribución y Calidad de Representación",
+             label = "pca_results") %>%
+  kableExtra::kable_styling(latex_options = c("striped", "scale_down", "hold_position"))
+
+```
+
+
+En las dimensiones 3 y 4 (tabla 4), las variables de seguridad cobran protagonismo: Delitos contra la formación sexual (DCFS) y Violencia Intrafamiliar (VI) son las que más contribuyen a la Dim3 (28.46% y 30.95%, respectivamente), mientras que la variable Secuestros (S) tiene un rol importante en la Dim4 (17.92%). Esto sugiere que estas dimensiones capturan esencialmente aspectos relacionados con violencia y criminalidad, diferenciando ciudades según su situación en materia de seguridad.
+
+
+
+
+```{r cos256, , echo=FALSE, warning=FALSE, results='asis'}
+# Crear un dataframe con todas las métricas
+var_coord <- as.data.frame(round(pcaRHINTce$var$coord, 4))
+var_contrib <- as.data.frame(round(pcaRHINTce$var$contrib, 2))
+var_cos2 <- as.data.frame(round(pcaRHINTce$var$cos2, 4))
+
+# Combinar solo las primeras 2 dimensiones
+var_results <- data.frame(
+  Variable = rownames(var_coord),
+  Coord_Dim5 = var_coord[,5],
+  Coord_Dim6 = var_coord[,6],
+  Contrib_Dim5 = var_contrib[,5],
+  Contrib_Dim6 = var_contrib[,6],
+  Cos2_Dim5 = var_cos2[,5],
+  Cos2_Dim6 = var_cos2[,6]
+)
+
+# Crear la tabla
+knitr::kable(var_results, "latex", booktabs = TRUE, 
+             caption = "Resultados del PCA: Coordenadas, Contribución y Calidad de Representación",
+             label = "pca_results") %>%
+  kableExtra::kable_styling(latex_options = c("striped", "scale_down", "hold_position"))
+
+```
+
+
+Por su parte, en las dimensiones 5 y 6 (tabla 5), se destaca Mortalidad Infantil (MI), que explica el 48.34% de la Dim6 y tiene un cos2 alto (0.5761), reflejando una representación muy fiel en este plano. También Homicidios (H) muestra una alta contribución (37.97%) en la Dim5 y se representa con gran claridad (cos2 = 0.4730). Estas dimensiones permiten interpretar patrones más específicos o residuales, principalmente vinculados con indicadores críticos de salud pública y violencia letal.
+
+Finalmente, variables como la Tasa de Ocupación (TOE), Calidad de los colegios (CC) y Capacitación para el trabajo (CPT) mantienen niveles bajos de contribución en las dimensiones más alejadas (Dim3–Dim6), reafirmando su influencia más marcada en las primeras componentes principales. Las variables suplementarias, aunque no contribuyen directamente a la construcción del espacio factorial, ayudan a enriquecer la interpretación, situando a las ciudades también desde una perspectiva de internacionalización y diversificación económica.
+
