@@ -177,7 +177,7 @@ kable(
 ```
 
 **Análisis de correlaciones variables-factor en las primeras seis dimensiones:**
-
+jnjnjnnjjn
 El análisis de las correlaciones revela patrones significativos en la estructura de los datos. En la Dimensión 1, la Tasa de Ocupación (0.904) y Tasa de Crecimiento Poblacional (0.819) muestran las correlaciones más altas, sugiriendo que este eje representa principalmente dinamismo económico y laboral. Contrariamente, la *Calidad de los Colegios (-0.671)* y *Cobertura en Educación Superior (-0.516)* presentan correlaciones negativas, indicando una posible tensión entre desarrollo urbano y calidad educativa. La Dimensión 2 está dominada por variables educativas (Cobertura Bruta en Educación Superior: 0.718) y demográficas (Población: 0.709), mientras que los *Secuestros (-0.632)* aparecen como contrapeso, reflejando un eje de "desarrollo vs. inseguridad". En la Dimensión 3, los Delitos contra la Formación Sexual (0.768) y Violencia Intrafamiliar (0.801) emergen como factores críticos, independientes de las dimensiones económicas. Las dimensiones restantes capturan relaciones más específicas: la Dimensión 4 asocia Secuestros (0.536) con variables educativas, la Dimensión 5 vincula Mortalidad Infantil (0.620) con Homicidios (0.688), y la Dimensión 6 muestra una fuerte correlación negativa entre *Cobertura en Salud (-0.759)* y otros factores.
 
 ### Variables y objetos graficados en distintas dimensione
