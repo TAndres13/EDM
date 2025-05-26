@@ -23,11 +23,14 @@ knitr::opts_chunk$set(echo = TRUE)
 Carga de achivos, organizacion de los datos y renombrar variables
 
 ```{r cars, results='hide',message = FALSE, warning=FALSE, }
-setwd("C:/Users/pipet/Downloads")
-getwd()
+
 library("FactoMineR")
 library("dplyr")
 library("kableExtra")
+library(readxl)
+library(FactoMineR)
+library(factoextra)
+library(kableExtra)
 
 CIUDADES <- readxl::read_excel("ciudades original-filtrado-con etiquetas (1).xlsx",
                                sheet = 1)
@@ -40,6 +43,75 @@ colnames(RHINT)[2:20] <- c("PC", "TCP","AA","CBPS","CBES","RAP","CC","CPT","CS",
                            ,"VI","H","S","BCPIB","CI","TOE","DP","DM")
 
 ```
+
+
+## Punto 2.
+
+## 2. Preparación de datos
+
+Seleccionamos las variables activas (internacionalización) y las variables ilustrativas (recursos humanos).
+
+```{r}
+base_acp <- RHINT[, c("BCPIB", "CI", "TOE", "DP", "DM", 
+                      "PC", "TCP", "AA", "CBPS", "CBES", "RAP", "CC", 
+                      "CPT", "CS", "MI", "DCFS", "VI", "H", "S")]
+```
+
+## 3. Análisis de Componentes Principales (ACP)
+
+```{r}
+res.pca <- PCA(base_acp, scale.unit = TRUE, quanti.sup = 6:19, graph = FALSE)
+```
+
+## 4. Resultados
+
+### a) Valores propios
+
+```{r}
+eig.val <- round(res.pca$eig, 3)
+kable(eig.val, format = "latex", booktabs = TRUE,
+      caption = "Valores propios y varianza explicada") %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+### b) Correlaciones de variables activas
+
+```{r}
+kable(round(res.pca$var$cor, 3), format = "latex", 
+      booktabs = TRUE,
+      caption = "Correlación de variables activas con los factores") %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+### c) Correlaciones de variables ilustrativas
+
+```{r}
+kable(round(res.pca$quanti.sup$cor, 3), format = "latex", 
+      booktabs = TRUE,
+      caption = "Correlación de variables ilustrativas con los factores") %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
+```
+
+## 5. Visualizaciones
+
+### a) Mapa de variables
+
+```{r}
+fviz_pca_var(res.pca, col.var = "cos2", 
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE, title = "Variables activas e ilustrativas")
+```
+
+### b) Biplot
+
+```{r}
+fviz_pca_biplot(res.pca, repel = TRUE, 
+                col.var = "#2E9FDF", col.ind = "#696969",
+                title = "Biplot: ciudades y variables")
+```
+
+
+
 
 ## Punto 3.
 
