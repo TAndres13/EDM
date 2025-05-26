@@ -374,6 +374,7 @@ Por otro lado, en su polo negativo, se observan cargas negativas significativas 
 *Violencia familiar/sexual vs. formación escolar:* Se combinan altos índices de VI/DCFS con sólida cobertura escolar  (Cuadrante I), un perfil mixto que exige políticas simultáneas de prevención de violencia y fortalecimiento educativo.
 
 *Salud y secuestros:* Bogotá y San Andrés (II) muestran que el reto principal es la seguridad (secuestros) y ajustes en salud, no tanto la violencia intrafamiliar.
+
 ```{r grafvarobjdim56, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Figura 4. Variables y ciudades en las Dimensiones 5 y 6", fig.align='center'}
 library(factoextra)
 library(ggpubr)
@@ -408,7 +409,7 @@ combined_plot <- ggpubr::ggarrange(bipl1, bipl2, nrow = 1)
 print(combined_plot)
 
 ```
-**Análisis de Relación entre variables y ciudades Dimesiones 5 y 6:** 
+
 **Análisis de Relación entre variables y ciudades Dimesiones 5 y 6:**
 
 El gráfico presenta la distribución de las variables activas y suplementarias, junto con la ubicación de las principales ciudades colombianas en las dos primeras dimensiones del ACP, que en conjunto explican el 17.5% de la varianza total.
