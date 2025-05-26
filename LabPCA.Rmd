@@ -154,10 +154,10 @@ kable(vp, format = "latex", booktabs = TRUE,
 ```
 
 
+
 **Análisis de los valores propios y varianza explicada:**   
 
-Los resultados del ACP revelan que los primeros seis componentes presentan valores propios mayores a 1, explicando en conjunto el 85.25% de la varianza total. El primer componente principal captura el 25.51% de la variabilidad, mostrando la mayor influencia individual, mientras que los dos primeros componentes acumulan el 41.50%, lo que permite una representación bidimensional inicial aunque limitada. La inclusión progresiva de componentes hasta el sexto (85.25%) ofrece un equilibrio óptimo entre reducción dimensional y conservación de información. Sin embargo, alcanzar el 90% de varianza requeriría ocho componentes, indicando que la estructura subyacente de los datos está distribuida multidimensionalmente. Las cinco variables suplementarias, aunque no contribuyen al cálculo de la varianza, permitirán enriquecer la interpretación de estos componentes al analizar su proyección en el espacio factorial. Este comportamiento sugiere que, si bien es posible reducir significativamente la dimensionalidad, la complejidad de los datos exige considerar múltiples dimensiones para un análisis exhaustivo.
-   
+Los resultados del Analisis de Componentes Principales (ACP) revelan que las primeras seis componentes presentan valores propios mayores a 1, juntando el 85.25% de la varianza acumulada entre ellas. La primera componente principal captura el 25.51% de la variabilidad, mostrando la mayor influencia individual, mientras que entre la primera y la segunda componente acumulan el 41.50%, lo que permite una representación bidimensional inicial, aunque limitada. La inclusión progresiva de componentes hasta la sexta componente (85.25%) ofrece un equilibrio óptimo entre reducción dimensional y conservación de información. Sin embargo, alcanzar el 90% de varianza requeriría ocho componentes, indicando que la estructura subyacente de los datos está distribuida multidimensionalmente. Las cinco variables suplementarias, aunque no contribuyen al cálculo de la varianza, permitirán enriquecer la interpretación de estos componentes al analizar su proyección en el espacio factorial (n-factores). Este comportamiento sugiere que, si bien es posible reducir significativamente la dimensionalidad, la complejidad de los datos exige considerar múltiples dimensiones para un análisis exhaustivo.
    
 \newpage   
 
@@ -177,8 +177,8 @@ kable(
 ```
 
 **Análisis de correlaciones variables-factor en las primeras seis dimensiones:**
-jnjnjnnjjn
-El análisis de las correlaciones revela patrones significativos en la estructura de los datos. En la Dimensión 1, la Tasa de Ocupación (0.904) y Tasa de Crecimiento Poblacional (0.819) muestran las correlaciones más altas, sugiriendo que este eje representa principalmente dinamismo económico y laboral. Contrariamente, la *Calidad de los Colegios (-0.671)* y *Cobertura en Educación Superior (-0.516)* presentan correlaciones negativas, indicando una posible tensión entre desarrollo urbano y calidad educativa. La Dimensión 2 está dominada por variables educativas (Cobertura Bruta en Educación Superior: 0.718) y demográficas (Población: 0.709), mientras que los *Secuestros (-0.632)* aparecen como contrapeso, reflejando un eje de "desarrollo vs. inseguridad". En la Dimensión 3, los Delitos contra la Formación Sexual (0.768) y Violencia Intrafamiliar (0.801) emergen como factores críticos, independientes de las dimensiones económicas. Las dimensiones restantes capturan relaciones más específicas: la Dimensión 4 asocia Secuestros (0.536) con variables educativas, la Dimensión 5 vincula Mortalidad Infantil (0.620) con Homicidios (0.688), y la Dimensión 6 muestra una fuerte correlación negativa entre *Cobertura en Salud (-0.759)* y otros factores.
+
+El análisis de las correlaciones revela patrones significativos en la estructura de los datos. En la Dimensión 1, la *Analfetismo absoluto (0.904)* y *Tasa de Crecimiento Poblacional (0.819)* muestran las correlaciones positivas más altas, sugiriendo que este eje representa principalmente desafíos socio-demográficos (condiciones de menor desarrollo social). Contrariamente, la *Calidad de los Colegios (-0.671)* y *Cobertura en Educación Superior (-0.516)* presentan correlaciones negativas, indicando una posible tensión entre desarrollo urbano y calidad educativa. La Dimensión 2 está dominada por variables educativas *(Cobertura Bruta en Educación Superior: 0.718)* y demográficas *(Población de la Ciudad: 0.709)*, mientras que los *Secuestros (-0.632)* aparecen como contrapeso, reflejando un eje de "desarrollo vs. inseguridad". En la Dimensión 3, los *Delitos contra la Formación Sexual (0.768)* y *Violencia Intrafamiliar (0.801)* emergen como factores críticos, independientes de las dimensiones económicas. Las dimensiones restantes capturan relaciones más específicas: la Dimensión 4 asocia con una correlación positiva *Secuestros (0.536)* con variables educativas (5) mientras que las variables *Cobertura bruta en primaria y secundaria (-0.5551)* y *Capacitación para el trabajo (-0.5536)* tienen una correlación negativa moderada. Esto sugiere que las ciudades con una alta incidencia de secuestros también pueden presentar deficiencias en estas áreas educativas fundamentales. La Dimensión 5 establece un vínculo claro entre la *Mortalidad Infantil (0.620)*  y los *Homicidios (0.688)*. Estas fuertes correlaciones positivas sugieren que las áreas con tasas más altas de mortalidad infantil también pueden experimentar niveles elevados de violencia. La Dimensión 6 revela una fuerte correlación negativa con la *Cobertura en Salud (-0.759)*. Esto indica que esta dimensión 6 se define en gran medida por la relación inversa con la cobertura en salud, sugiriendo que otros factores dentro de esta dimensión tienden a disminuir a medida que aumenta la cobertura en salud.
 
 ### Variables y objetos graficados en distintas dimensione
 
@@ -221,9 +221,20 @@ grid::grid.draw(combined_plot)
 
 El gráfico presenta la distribución de las variables activas y suplementarias, junto con la ubicación de las principales ciudades colombianas en las dos primeras dimensiones del ACP, que en conjunto explican el 41.5% de la varianza total.
 
-En la **Dimensión 1 (25.5% de varianza)**, observamos un claro contraste entre indicadores de desarrollo y problemáticas sociales. Las variables con mayor contribución positiva incluyen la cobertura en formación superior (CBF-S DM) y la relación alumno-profesor (RAP), asociadas principalmente a Bogotá y Medellín. En el extremo opuesto, los secuestros (S) aparecen vinculados a ciudades como Cúcuta y Riohacha. Las variables suplementarias, particularmente la balanza comercial/PIB (BCPIB), aunque con menor peso (cos² bajo), muestran una tendencia a alinearse con los indicadores de desarrollo económico.
+En la **Dimensión 1 (25.5% de varianza)**, observamos un claro contraste entre indicadores de desarrollo y problemáticas sociales. Las variables con mayor contribución positiva incluyen la *Cobertura bruta en educación superior* (CBES) con *Diversificación de los mercados* (DM) como variable ilustrativa, lo que indica que a mayor educación superior también sube la diversificación en los mercados. Mientras que *Cobertura bruta en educación superior* (CBES)  y la *relación alumno-profesor* (RAP), estan asociadas principalmente a las ciudades Bogotá y Medellín. En el extremo opuesto, los *secuestros* (S) aparecen vinculados a ciudades como Cúcuta y Riohacha.
 
-La **Dimensión 2 (16% de varianza)** revela una diferenciación adicional, donde la violencia intrafamiliar (VI) se ubica en la parte superior del gráfico, mientras que variables educativas ocupan la zona inferior. Ciudades intermedias como Pasto y Villavicencio se posicionan en zonas más centrales de este eje.
+La **Dimensión 2 (16% de varianza)** revela una diferenciación adicional, donde la *violencia intrafamiliar* (VI) se ubica en la parte superior del gráfico, mientras que variables educativas ocupan la zona inferior.
+
+**Posicionamiento de las Ciudades(Gráfico B):**
+
+*Riohacha, Valledupar, Medellín* se encuentran en el Cuadrante I (+ Dimensión 1 / + Dimensión 2)lo que indica que estas ciudades se caracterizan por presentar una alta tasa de crecimiento demográfico y, simultáneamente, un buen acceso a educación básica y servicios de salud.
+
+*Bogotá D.C., Bucaramanga, Cali, Armenia, Popayán* estas ciudades en el Cuadrante II (– Dimensión 1 / + Dimensión 2) este grupo de ciudades exhibe una sólida infraestructura educativa y sanitaria, aunque con un menor dinamismo demográfico en comparación con las del cuadrante I.
+
+*San Andrés* esta ciudad se encuentra en el Cuadrante III (– Dimensión 1 / – Dimensión 2): 
+se distingue por no presentar un crecimiento poblacional destacado ni buenos servicios. Además, prevalecen en ella riesgos asociados a secuestros y una baja capacitación laboral.
+
+*Villavicencio, Santa Marta, Ibagué* ubicadas en el Cuadrante IV (+ Dimensión 1 / – Dimensión 2) muestran un crecimiento y retos demográficos importantes, pero también se ven afectadas por altos niveles de violencia intrafamiliar y delitos sexuales.
 
 **Principales hallazgos**:
 1. Las capitales principales (Bogotá, Medellín) muestran el mejor desempeño en indicadores clave de desarrollo
@@ -231,6 +242,72 @@ La **Dimensión 2 (16% de varianza)** revela una diferenciación adicional, dond
 3. Las variables suplementarias, aunque con representación limitada, sugieren relaciones interesantes que merecen mayor exploración
 
 Este análisis evidencia la utilidad del ACP para identificar patrones territoriales y relaciones complejas entre múltiples indicadores socioeconómicos. La posición relativa de las variables suplementarias, en particular BCPIB y DM, ofrece valiosos insumos para investigaciones posteriores sobre los factores que impulsan el desarrollo regional.
+
+```{r grafvarobjdim13, echo=FALSE, message=FALSE, warning=FALSE, results='asis',fig.cap="Figura 1.1 Variables y ciudades en las Dimensiones 1 y 3"}
+# Cargar librerías
+library(factoextra)
+library(gridExtra)
+
+# Gráfico de variables (dimensiones 1 y 3)
+bipl1 <- fviz_pca_var(
+  pcaRHINTce,
+  axes = c(1, 3),             # <<< Aquí el cambio principal
+  label = "var",
+  col.var = "cos2",
+  gradient.cols = c("blue", "orange", "red"),
+  repel = TRUE,
+  title = "A) Variables (Dim.1 vs Dim.3)",
+  labelsize = 3
+)
+
+# Gráfico de individuos (dimensiones 3 y 4)
+bipl2 <- fviz_pca_ind(
+  pcaRHINTce,
+  axes = c(1, 3),             # <<< Aquí también
+  label = "ind",
+  col.ind = "cos2",
+  gradient.cols = c("blue", "orange", "red"),
+  repel = TRUE,
+  title = "B) Ciudades (Individuos - Dim.1 vs Dim.3)",
+  labelsize = 3
+)
+
+
+# Combinar los gráficos en uno solo
+combined_plot <- gridExtra::arrangeGrob(bipl1, bipl2, nrow = 1)
+
+# Dibujar el gráfico con título (fig.cap funciona ahora)
+grid::grid.draw(combined_plot)
+
+
+```
+
+**Análisis de Relación entre variables y ciudades Dimesiones 1 y 3**
+
+El gráfico presenta la distribución de las variables activas y suplementarias, junto con la ubicación de las principales ciudades colombianas en las dos primeras dimensiones del ACP, que en conjunto explican el 40.3% de la varianza total.
+
+La **Dimensión 1 (25.5% de varianza)**: Hacia la derecha, se agrupan los indicadores que reflejan desafíos en el desarrollo socioeconómico y humano, como el Analfabetismo Absoluto (AA), la Tasa de Crecimiento Poblacional (TCP), la Relación Alumno-Profesor (RAP) y la Mortalidad Infantil (MI). En contraposición, hacia la izquierda, se posicionan las variables relacionadas con una sólida infraestructura educativa y capital social, incluyendo la Calidad de los Colegios (CC) y la Cobertura Bruta en Educación Superior (CBES). Además, en esta misma dirección, se ubican variables suplementarias como la Población de la Ciudad (PC) y la Diversificación de Mercados (DM), sugiriendo una asociación con entornos más desarrollados y complejos.
+
+La **Dimensión 3 (14.8% de varianza)**: En la parte superior, se concentran indicadores de lo que podríamos llamar problemáticas "cognitivo-motoras" y de seguridad más específicas, como la Violencia Intrafamiliar (VI), los Delitos contra la Formación Sexual (DCFS) y la Cobertura Bruta Primaria-Secundaria (CBPS). En contraste, en la parte inferior, encontramos indicadores de seguridad y bienestar con un carácter más "general" o social, como la Cobertura en Salud (CS) y los Secuestros (S).
+
+**Posicionamiento de las Ciudades (Gráfico B):**
+
+*Villavicencio* se ubica en el cuadrante superior-derecho (Dimensión 1 positiva, Dimensión 3 positiva), lo que sugiere que esta ciudad experimenta tanto un alto dinamismo demográfico-educativo como elevados problemas de Violencia Intrafamiliar y Delitos contra la Formación Sexual.
+
+*Riohacha, Valledupar, Santa Marta y Montería* se sitúan en la zona de alto valor en la Dimensión 1 pero bajo en la Dimensión 3. Esto indica que estas ciudades muestran crecimiento y desarrollo poblacional, pero con menores incidencias de delitos intrafamiliares o contra la formación sexual.
+
+*Bucaramanga, Manizales y Pereira* se posicionan hacia el lado positivo de la Dimensión 3 y cerca de cero en la Dimensión 1. Este perfil apunta a que estas ciudades enfrentan retos significativos en violencia intrafamiliar y comunitaria, sin un claro predominio de un perfil de desarrollo demográfico-educativo específico.
+
+*Bogotá D.C., Popayán, Pasto y Barranquilla* se agrupan en el cuadrante inferior-izquierdo. Esta característica las define por un menor dinamismo poblacional y una infraestructura educativa consolidada, acompañada de niveles relativamente bajos de violencia específica.
+
+*San Andrés* destaca por su posición en los valores negativos de ambas Dimensiones 1 y 3. Esto sugiere que presenta tanto un bajo crecimiento/dinamismo como menores problemas de Violencia Intrafamiliar y Delitos contra la Formación Sexual.
+
+**Principales hallazgos**
+
+1. *Dualidad desarrollo-violencia*: algunas ciudades (e.g. Villavicencio) combinan alto crecimiento social con elevados delitos familiares y sexuales, mientras que otras con crecimiento similar muestran menos violencia (Riohacha, Santa Marta).
+
+2. *Zonas de riesgo educativo-violento*: ciudades con baja infraestructura educativa (CC/CBES) suelen presentar mayores índices de VI/DCFS (cuadrante superior-izquierdo).
+
 
 ```{r grafvarobjdim34, echo=FALSE, message=FALSE, warning=FALSE, results='asis',fig.cap="Figura 1. Variables y ciudades en las Dimensiones 3 y 4"}
 # Cargar librerías
@@ -272,8 +349,31 @@ grid::grid.draw(combined_plot)
 ```
 
 
-**Análisis de Relación entre variables y ciudades Dimesiones 3 y 4:** El gráfico revela patrones complementarios a las dimensiones principales, donde la **Dimensión 3 (14.8% varianza)** contrasta cobertura en salud (CS) con problemáticas sociales (DCFS), mostrando que ciudades como Villavicencio y Pasto tienen mejores indicadores sanitarios, mientras Riohacha y Cúcuta presentan mayores desafíos. La **Dimensión 4 (11.4%)** distingue entre variables económicas (BCPIB, CBP/S) y de formación laboral (CPT), evidenciando que el desarrollo comercial no necesariamente se asocia a mejor capacitación. Bogotá muestra una posición intermedia en ambas dimensiones, destacando que su ventaja en indicadores globales no se repite en estos aspectos específicos. Las variables suplementarias (como BCPIB) confirman que esta dimensión captura dinámicas económicas regionales.
+**Análisis de Relación entre variables y ciudades Dimesiones 3 y 4:**
 
+El gráfico presenta la distribución de las variables activas y suplementarias, junto con la ubicación de las principales ciudades colombianas en las dos primeras dimensiones del ACP, que en conjunto explican el 26.2% de la varianza total.
+
+La **Dimensión 3 (14.8% de la varianza)**: Este eje se define fuertemente por cargas positivas elevadas de variables como los Delitos *contra la Formación Sexual* (DCFS), la *Violencia Intrafamiliar* (VI) y la *Cobertura Bruta en Primaria y Secundaria* (CBPS). Esto indica que las ciudades con puntuaciones altas en esta dimensión no solo predominan en problemáticas de violencia familiar y sexual, sino que también presentan una mayor cobertura en la escolarización primaria y secundaria.
+
+La **Dimensión 4 (11.4%)**: En su polo positivo, la Dimensión 4 se caracteriza por cargas positivas altas en *Delitos contra la Formación Sexual* (DCFS), *Violencia Intrafamiliar* (VI), *Secuestros* (S) y *Cobertura en Salud* (CS). Este polo refleja contextos donde coexisten altos índices de delitos familiares, sexuales y secuestros, junto con variaciones en la cobertura sanitaria.
+
+Por otro lado, en su polo negativo, se observan cargas negativas significativas en *Capacitación para el Trabajo* (CPT) y *Homicidios* (H). Esto señala ciudades con bajos niveles de formación laboral y, simultáneamente, una mayor incidencia de homicidios.
+
+**Posicionamiento de las Ciudades (Gráfico B):**
+
+*Villavicencio* estas ciudades ubicadas en el Cuadrante I (+ Dimensión 3 / + Dimensión 4) se caracteriza por un contexto de fuerte violencia intrafamiliar y sexual, simultáneamente con una buena escolarización primaria y secundaria.
+
+*San Andrés, Bogotá D.C., Valledupar* ubicadas en el Cuadrante II (– Dimensión 3 / + Dimensión 4) presentan altos índices de secuestros y variaciones notables en la cobertura de salud, pero sin los picos de violencia familiar o sexual observados en el cuadrante anterior.
+
+*Armenia, Popayán* estas ciudades en el Cuadrante III (– Dimensión 3 / – Dimensión 4) muestran bajos niveles de capacitación laboral y menores índices de violencia familiar o sexual, lo que les confiere un perfil relativamente "tranquilo" en cuanto a estas problemáticas, aunque con un menor impulso en formación laboral.
+
+*Cúcuta, Sincelejo, Cartagena* ubicadas en el Cuadrante IV (+ Dimensión 3 / – Dimensión 4) a pesar de tener una buena cobertura en educación primaria y secundaria, estas ciudades enfrentan retos significativos de homicidios y menor capacitación para el trabajo, lo que las sitúa en una posición de desafíos mixtos.
+
+**Principales hallazgos:**
+
+*Violencia familiar/sexual vs. formación escolar:* Se combinan altos índices de VI/DCFS con sólida cobertura escolar  (Cuadrante I), un perfil mixto que exige políticas simultáneas de prevención de violencia y fortalecimiento educativo.
+
+*Salud y secuestros:* Bogotá y San Andrés (II) muestran que el reto principal es la seguridad (secuestros) y ajustes en salud, no tanto la violencia intrafamiliar.
 ```{r grafvarobjdim56, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Figura 4. Variables y ciudades en las Dimensiones 5 y 6", fig.align='center'}
 library(factoextra)
 library(ggpubr)
@@ -309,8 +409,31 @@ print(combined_plot)
 
 ```
 **Análisis de Relación entre variables y ciudades Dimesiones 5 y 6:** 
+**Análisis de Relación entre variables y ciudades Dimesiones 5 y 6:**
 
-En el plano definido por las dimensiones 5 (9%) y 6 (8.5%), se identifican asociaciones residuales entre variables sociales. La dimensión 5 muestra una oposición entre la cobertura en salud (CS), ubicada en el extremo negativo, y los homicidios (H) y mortalidad infantil (MT), más próximos al lado positivo. La dimensión 6 se vincula positivamente con capacitación para el trabajo (CPT) y delitos contra la formación sexual (DCFS), sugiriendo un eje relacionado con vulnerabilidades sociales y esfuerzos educativos. Las variables suplementarias de internacionalización tienen una baja contribución en estas dimensiones, aunque diversificación de productos (DP) y mercados (DM) se orientan ligeramente hacia la Dim.6. En cuanto a las ciudades, Bogotá D.C., Ibagué y Armenia destacan positivamente en Dim.6, mientras que Pasto, Cali, Cúcuta y Bucaramanga se proyectan hacia el cuadrante negativo, posiblemente por menores niveles de cobertura o mayores problemáticas sociales. Esta representación complementa los factores principales revelando patrones específicos de ciertas regiones.
+El gráfico presenta la distribución de las variables activas y suplementarias, junto con la ubicación de las principales ciudades colombianas en las dos primeras dimensiones del ACP, que en conjunto explican el 17.5% de la varianza total.
+
+En el plano definido por las **dimensiones 5 (9%) y 6 (8.5%)**, se identifican asociaciones residuales entre variables sociales. La dimensión 5 muestra una oposición entre la *cobertura en salud* (CS), ubicada en el extremo negativo, y los *homicidios* (H) y *mortalidad infantil* (MT), más próximos al lado positivo. La dimensión 6 se vincula positivamente con *capacitación para el trabajo* (CPT) y *delitos contra la formación sexual* (DCFS), sugiriendo un eje relacionado con vulnerabilidades sociales y esfuerzos educativos. Las variables suplementarias de internacionalización tienen una baja contribución en estas dimensiones, aunque *diversificación de productos* (DP) y *mercados* (DM) se orientan ligeramente hacia la Dim.6.
+
+**Posicionamiento de las Ciudades (Gráfico B):**
+
+*Bogotá D.C., Armenia* estas ciudades ubicadas en elcuadrante I (+ Dim 5 / + Dim 6) se caracterizan por una compleja mezcla de altos homicidios y mortalidad infantil, coexistiendo con una elevada capacitación laboral y una notable prominencia poblacional y educativa.
+
+*San Andrés, Montería, Sincelejo* ubicadas en el cuadrante II (– Dim 5 / + Dim 6) aquí encontramos ciudades con buena escolarización y una fuerte apuesta por la formación laboral y la educación superior.
+
+*Pasto, Bucaramanga, Tunja, Medellín, Barranquilla, Valledupar* ciudades ubicadas en el cuadrante III (– Dim 5 / – Dim 6) exhiben un perfil generalmente "tranquilo", con sólidas coberturas educativa y sanitaria, baja mortalidad y menos homicidios.
+
+*Cúcuta, Cali, Pereira* ubicadas en el cuadrante IV (+ Dim 5 / – Dim 6) estas ciudades enfrentan el desafío de altos índices de homicidios y mortalidad infantil, agravado por una cobertura de salud relativamente deficiente.
+
+**Principales hallazgos:**
+
+*Dualidad violencia–formación poblacional:* Bogotá y Armenia (Cuadrante I) muestran que, pese a un contexto violento (homicidios/MI altos), cuentan con fuertes programas de capacitación y población joven/educada.
+
+*Modelos opuestos de ciudad:* Pasto y Bucaramanga (III) combinan baja violencia con buenos servicios educativos y sanitarios, pero sin apuesta fuerte por la formación técnica.
+
+*Oportunidades de intervención sanitaria:* Cúcuta y Cali (IV) requieren priorizar mejoras en cobertura de salud para mitigar sus altos índices de homicidios y mortalidad infantil.
+
+Finalmente las Dimensiones 5 y 6 permiten afinar políticas de seguridad, salud y formación atendiendo a perfiles residuales que no se capturan completamente en los ejes principales.
 
 ### Biplots
 
