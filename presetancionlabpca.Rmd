@@ -457,3 +457,197 @@ Dos modelos exitosos:
 - Cúcuta/Cali: Urgen mejoras en salud
 
 -  Pasto/Medellín: Modelo a replicar
+
+---
+
+### Biplots
+
+#### Biplot en las Dimensiones 1 y 2
+
+```{r biplotdim12, echo=FALSE, warning=FALSE, fig.cap="Figura 4. Biplot: Variables y ciudades en las Dimensiones 1 y 2", fig.align='center'}
+print(
+  fviz_pca_biplot(pcaRHINTce,
+                  axes = c(1, 2),
+                  geom = c("point", "text"),
+                  col.ind = "cos2",
+                  gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+                  col.var = "contrib",
+                  alpha.var = "contrib",
+                  repel = TRUE,
+                  title = "Biplot ACP - Dimensiones 1 y 2",
+                  legend.title = list(
+                    cos2 = "Calidad de representación",
+                    contrib = "Contribución (%)"
+                  )) +
+    theme_minimal() +
+    theme(legend.position = "right")
+)
+```
+
+---
+
+##### Biplot Dimensiones 1 y 2
+El biplot (41.5% varianza total) revela contrastes socioeconómicos entre ciudades:
+
+- Dimensión 1 (25.5%): Seguridad vs. Desarrollo
+
+  - (+) Riohacha/Valledupar: altos Homicidios (H) y Mortalidad Infantil (MI)
+
+  - (-) Bogotá/Medellín: mejor Cobertura Salud (CS) y Educación Superior (CBES)
+
+- Dimensión 2 (16%): Excelencia educativa
+
+  - (+) Bogotá/Medellín: destacan en Calidad Colegios (CC) y CBES
+
+  - (-) San Andrés/Ibagué: menores indicadores educativos
+
+- Variables suplementarias (internacionalización) correlacionan levemente con ciudades desarrolladas.
+
+---
+
+#### Biplot en las Dimensiones 1 y 3
+
+```{r biplotdim13, echo=FALSE, warning=FALSE, results='asis',fig.cap="Figura 4.1 biplot Dimensiones 1 y 3"}
+#biplot
+#reprenstacion simulatane de universidades y variables
+
+fviz_pca_biplot(pcaRHINTce,
+                axes = c(1, 3),  # Ejes a visualizar (primera y segunda dimensión)
+                geom = c("point", "text"),  # Mostrar puntos y etiquetas
+                col.ind = "cos2",  # Color de individuos por calidad de representación
+                gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),  # Escala de colores
+                col.var = "contrib",  # Color de variables por contribución
+                alpha.var = "contrib",  # Transparencia según contribución
+                repel = TRUE,  # Evitar solapamiento de etiquetas
+                title = "Biplot ACP - Dimensiones 1 y 3",
+                legend.title = list(
+                  cos2 = "Calidad de representación",
+                  contrib = "Contribución (%)"
+                )) +
+  theme_minimal() +
+  theme(legend.position = "right")
+```
+
+---
+
+##### Biplot Dimensiones 1 y 3
+
+
+\scriptsize
+- Ejes principales (40.3% varianza total):
+
+- Dimensión 1 (25.5%): Contrasta dinamismo demográfico (TCP, AA) con calidad educativa (CC, CBES). Ciudades como Villavicencio muestran alto crecimiento pero desafíos en alfabetización, mientras Bogotá y Pasto destacan por su infraestructura formativa.
+
+- Dimensión 3 (14.8%): Revela una tensión entre violencia (VI, DCFS) y escolarización básica (CBPS), con ciudades como Bucaramanga combinando buena cobertura educativa con focos de violencia doméstica.
+
+- Hallazgos clave:
+
+  - Cuatro perfiles urbanos identificados: desde ciudades con crecimiento acelerado y violencia (Villavicencio) hasta aquellas con educación sólida y baja criminalidad (Bogotá).
+
+  - Variables como Cobertura en Salud (CS) y Secuestros (S) requieren análisis en otras dimensiones para su plena interpretación.
+
+  - Las variables suplementarias (ej: diversificación de mercados) matizan patrones, sugiriendo que factores económicos complementan estas dimensiones.
+
+- Conclusión: Este plano destaca la necesidad de políticas que equilibren crecimiento poblacional, calidad educativa y seguridad, invitando a profundizar en dimensiones adicionales para un diagnóstico integral.
+
+---
+
+#### Biplot en las Dimensiones 3 y 4
+
+```{r biplotdim34, echo=FALSE, warning=FALSE, results='asis',fig.cap="Figura 4. biplot Dimensiones 3 y 4"}
+#biplot
+#reprenstacion simulatane de universidades y variables
+
+fviz_pca_biplot(pcaRHINTce,
+                axes = c(3, 4),  # Ejes a visualizar (primera y segunda dimensión)
+                geom = c("point", "text"),  # Mostrar puntos y etiquetas
+                col.ind = "cos2",  # Color de individuos por calidad de representación
+                gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),  # Escala de colores
+                col.var = "contrib",  # Color de variables por contribución
+                alpha.var = "contrib",  # Transparencia según contribución
+                repel = TRUE,  # Evitar solapamiento de etiquetas
+                title = "Biplot ACP - Dimensiones 3 y 4",
+                legend.title = list(
+                  cos2 = "Calidad de representación",
+                  contrib = "Contribución (%)"
+                )) +
+  theme_minimal() +
+  theme(legend.position = "right")
+```
+
+---
+
+##### Biplot Dimensiones 3 y 4
+
+
+
+- Dimensión 3 (14.8%):
+
+  - Enfoque: Violencia intrafamiliar (VI) y delitos sexuales (DCFS)
+
+  - Ciudades críticas: Bucaramanga (alta incidencia)
+
+  - Ciudades destacadas: Armenia, Cartago y Manizales (baja incidencia + buena cobertura educativa CBPS)
+
+- Dimensión 4 (11.4%):
+
+. Variables económicas: BCPIB y TCP con influencia moderada
+
+- Caso atípico: Villavicencio (dinámicas no explicadas por estas dimensiones)
+
+- Conclusiones:
+
+  - Patrones claros de violencia de género vs. desempeño educativo
+
+  - Oportunidad para políticas focalizadas en seguridad ciudadana y equidad educativa
+
+  - Necesidad de análisis adicional para casos atípicos
+
+
+---
+
+#### Biplot en las Dimensiones 5 y 6
+
+```{r biplotdim56, echo=FALSE, warning=FALSE, results='asis',fig.cap="Figura 4. biplot Dimensiones 5 y 6"}
+#biplot
+#reprenstacion simulatane de universidades y variables
+
+fviz_pca_biplot(pcaRHINTce,
+                axes = c(5, 6),  # Ejes a visualizar (primera y segunda dimensión)
+                geom = c("point", "text"),  # Mostrar puntos y etiquetas
+                col.ind = "cos2",  # Color de individuos por calidad de representación
+                gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),  # Escala de colores
+                col.var = "contrib",  # Color de variables por contribución
+                alpha.var = "contrib",  # Transparencia según contribución
+                repel = TRUE,  # Evitar solapamiento de etiquetas
+                title = "Biplot ACP - Dimensiones 5 y 6",
+                legend.title = list(
+                  cos2 = "Calidad de representación",
+                  contrib = "Contribución (%)"
+                )) +
+  theme_minimal() +
+  theme(legend.position = "right")
+```
+
+---
+
+##### Biplot Dimensiones 5 y 6
+
+
+- Dimensión 5 (9%):
+
+  - Variable clave: Homicidios (H)
+
+  - Ciudades críticas: Riohacha, Pereira, Cúcuta (alta violencia letal)
+
+- Dimensión 6 (8.5%):
+
+  - Variable moderada: Secuestros (S) (impacto negativo)
+
+  - Ciudades estables: Bogotá, Ibagué, Cartago (posición neutra)
+
+- Patrón destacado:
+
+  - Ciudades con alta incidencia de homicidios se agrupan claramente
+  - Variables de bienestar (CS, CC) tienen influencia secundaria
+
