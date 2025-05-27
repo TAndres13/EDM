@@ -458,9 +458,42 @@ print(
 )
 ```
 **Biplot Dimensiones 1 y 2**
-En el biplot correspondiente a las dimensiones 1 (25.5%) y 2 (16%), se observa una clara organización de las variables y ciudades que reflejan las principales fuentes de variabilidad en el análisis. La dimensión 1 diferencia a las ciudades con altos niveles de homicidios (H), mortalidad infantil (MI), y tasa de crecimiento poblacional (TCP) —como Riohacha y Arauca— ubicadas a la derecha, de aquellas con mayor cobertura en salud (CS), cobertura en educación superior (CBES), y balanza comercial/PIB (BCPIB), situadas a la izquierda. Por su parte, la dimensión 2 resalta a Bogotá D.C. y Medellín por sus altos niveles en calidad de colegios (CC) y cobertura en educación superior (CBES), contrastando con ciudades como San Andrés o Ibagué, que presentan valores negativos. Las variables suplementarias asociadas a la internacionalización (como el coeficiente de internacionalización - CI y la tasa de orientación exportadora - TOE) tienen también una orientación positiva sobre la Dim.2. Este gráfico revela patrones claros de agrupamiento regional y sugiere una estructura subyacente en torno a condiciones educativas, sociales y económicas diferenciadas entre las ciudades analizadas.
+El biplot de las dimensiones 1 (25,5 %) y 2 (16 %) ofrece una representación clara de las principales diferencias socioeconómicas entre las ciudades analizadas.
 
+La Dimensión 1 enfrenta, en su extremo derecho, indicadores como Homicidios (H), Mortalidad Infantil (MI) y Tasa de Crecimiento Poblacional (TCP), que ubican a Riohacha y Valledupar entre las ciudades con mayores retos en seguridad y demografía. Hacia la izquierda, en cambio, se agrupan Cobertura en Salud (CS), Cobertura en Educación Superior (CBES) y Balanza Comercial/PIB (BCPIB), rasgos propios de urbes con servicios más sólidos y economías diversificadas, como Bogotá D.C. y Medellín.
 
+La Dimensión 2 realza el posicionamiento de Bogotá y Medellín por sus altos puntajes en Calidad de los Colegios (CC) y CBES, mientras que San Andrés e Ibagué se sitúan en la parte inferior, reflejando menores niveles en estos indicadores educativos.
+
+Las variables suplementarias (en azul), sobre todo aquellas vinculadas a la internacionalización —Coeficiente de Internacionalización (CI) y Tasa de Orientación Exportadora (TOE)— mantienen una ligera inclinación hacia valores positivos de la Dimensión 2, sugiriendo su aporte al perfil de las ciudades más desarrolladas.
+
+```{r biplotdim13, echo=FALSE, warning=FALSE, results='asis',fig.cap="Figura 4.1 biplot Dimensiones 1 y 3"}
+#biplot
+#reprenstacion simulatane de universidades y variables
+
+fviz_pca_biplot(pcaRHINTce,
+                axes = c(1, 3),  # Ejes a visualizar (primera y segunda dimensión)
+                geom = c("point", "text"),  # Mostrar puntos y etiquetas
+                col.ind = "cos2",  # Color de individuos por calidad de representación
+                gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),  # Escala de colores
+                col.var = "contrib",  # Color de variables por contribución
+                alpha.var = "contrib",  # Transparencia según contribución
+                repel = TRUE,  # Evitar solapamiento de etiquetas
+                title = "Biplot ACP - Dimensiones 1 y 3",
+                legend.title = list(
+                  cos2 = "Calidad de representación",
+                  contrib = "Contribución (%)"
+                )) +
+  theme_minimal() +
+  theme(legend.position = "right")
+```
+
+**Biplot Dimensiones 1 y 3**
+
+El biplot de las dimensiones 1 (25,5 %) y 3 (14,8 %): en el eje horizontal, se opone el dinamismo demográfico y los desafíos educativos a la fortaleza de la infraestructura formativa y económica. Hacia la derecha, las flechas intensas de Analfabetismo Absoluto (AA), Tasa de Crecimiento Poblacional (TCP) y Relación Alumno–Profesor (RAP) señalan a ciudades que crecen rápido pero afrontan altos retos de alfabetización y mortalidad infantil. En el extremo opuesto, las vectores más suaves de Calidad de los Colegios (CC), Cobertura en Educación Superior (CBES) y Diversificación de Mercados (DM) identifican urbes con mejor formación académica y economías diversificadas, aunque con un pulso poblacional más pausado. En el eje vertical, aparecen las fuertes contribuciones de Violencia Intrafamiliar (VI) y Delitos contra la Formación Sexual (DCFS), junto a la Cobertura Primaria/Secundaria (CBPS), configurando un cuadrante donde la escolarización básica convive con focos de violencia; hacia abajo, flechas semitransparentes de Cobertura en Salud (CS) y Secuestros (S) nos recuerdan que su relato emerge con mayor nitidez en otros planos del análisis.
+
+Al situar las ciudades, distinguimos claramente cuatro perfiles: aquellas que combinan rápido crecimiento y altos índices de violencia familiar y sexual (Villavicencio, cuadrante I); las que, sin gran dinamismo poblacional, aún presentan focos de violencia doméstica junto a buena escolarización primaria (Bucaramanga y Manizales, cuadrante II); las que exhiben sólida infraestructura educativa y bajos niveles de delito, aunque con crecimiento moderado (Bogotá D.C., Pasto y Barranquilla, cuadrante III); y las que crecen con menor violencia intrafamiliar o sexual (Riohacha y Valledupar, cuadrante IV). 
+
+La transparencia moderada de algunas flechas nos recuerda que variables como CS o S tienen su fuerza repartida en otras dimensiones y no deben descartarse, mientras que las variables suplementarias (PC, DP, BCPIB, TOE), con flechas muy tenues, subrayan su papel de matizar la complejidad urbana más allá de estos dos ejes. En conjunto, este plano 1–3 no sólo destaca la dualidad entre crecimiento y violencia, sino que también invita a explorar ejes adicionales para diseñar políticas que equilibren desarrollo demográfico, calidad educativa y seguridad ciudadana.
 
 ```{r biplotdim34, echo=FALSE, warning=FALSE, results='asis',fig.cap="Figura 4. biplot Dimensiones 3 y 4"}
 #biplot
@@ -484,8 +517,11 @@ fviz_pca_biplot(pcaRHINTce,
 ```
 
 **Biplot Dimensiones 3 y 4**
-El biplot de las dimensiones 3 y 4 revela información complementaria sobre la variabilidad entre ciudades, con énfasis en aspectos de violencia y educación. En la dimensión 3 destacan positivamente los delitos contra la formación sexual (DCFS) y la violencia intrafamiliar (VI), lo que sugiere que Bucaramanga se asocia en mayor medida con estos problemas sociales. En contraste, ciudades como Armenia, Cartago y Manizales aparecen en la parte baja de la Dim.3, relacionadas con menores niveles en estas variables. La cobertura bruta en primaria y secundaria (CBPS) también contribuye negativamente a esta dimensión, separando ciudades con mejor desempeño educativo. Por otro lado, la dimensión 4 muestra una ligera dispersión en variables como balanza comercial/PIB (BCPIB) y tasa de crecimiento poblacional (TCP), asociadas a Bogotá y Tunja. Llama la atención Villavicencio, que se aleja en el extremo superior derecho, aunque sin fuerte relación con alguna variable específica. En conjunto, este plano pone de relieve diferencias en fenómenos de violencia y desempeño educativo, ofreciendo claves importantes para entender las dinámicas sociales diferenciadas entre las ciudades.
+El biplot de las dimensiones 3 (14.8%) y 4 (11.4%) aporta una visión complementaria sobre la diversidad social entre ciudades, enfocándose especialmente en variables relacionadas con la violencia intrafamiliar, delitos sexuales y cobertura educativa. En la Dimensión 3, las variables Delitos contra la formación sexual (DCFS) y Violencia Intrafamiliar (VI) sobresalen con alta contribución positiva, lo que permite identificar a Bucaramanga como una ciudad fuertemente asociada con estos fenómenos sociales. En contraste, hacia el extremo negativo de esta dimensión se agrupan ciudades como Armenia, Cartago y Manizales, cuya ubicación sugiere una menor incidencia de estas problemáticas. En esta misma dirección negativa influye la Cobertura Bruta en Primaria y Secundaria (CBPS), que actúa como un indicador diferenciador de buen desempeño educativo.
 
+Por su parte, la Dimensión 4 muestra un comportamiento más difuso. Variables como la Balanza Comercial como proporción del PIB (BCPIB) y la Tasa de Crecimiento de la Población (TCP) aportan leves contrastes, particularmente entre Bogotá, Tunja y otras ciudades intermedias. Se destaca Villavicencio, que se proyecta en el cuadrante superior derecho de manera aislada, aunque no se encuentra estrechamente vinculada con ninguna de las variables representadas, lo que sugiere dinámicas propias que no están bien explicadas por estas dos dimensiones.
+
+En conjunto, este plano evidencia cómo algunas ciudades se enfrentan a mayores retos en términos de violencia de género, mientras que otras destacan por su cobertura educativa. Esta representación ayuda a clarificar las dinámicas sociales diferenciadas entre territorios, revelando no solo problemas estructurales, sino también oportunidades de mejora orientadas a la equidad educativa y la seguridad ciudadana.
 ```{r biplotdim56, echo=FALSE, warning=FALSE, results='asis',fig.cap="Figura 4. biplot Dimensiones 5 y 6"}
 #biplot
 #reprenstacion simulatane de universidades y variables
@@ -508,7 +544,13 @@ fviz_pca_biplot(pcaRHINTce,
 ```
 
 **Biplot Dimensiones 5 y 6**
-En el biplot de las dimensiones 5 y 6 se destacan principalmente variables asociadas a problemáticas de seguridad. La variable "Homicidios" (H) tiene una fuerte contribución positiva sobre la dimensión 5, y se encuentra relacionada especialmente con ciudades como Riohacha, Pereira y Cúcuta. En sentido opuesto, la variable "Secuestros" (S) tiene mayor peso negativo en la dimensión 6, aunque su impacto global es más moderado. Otras variables con menor pero significativa contribución en estas dimensiones incluyen la cobertura en salud (CS) y la calidad de los colegios (CC), aunque su dirección indica que su influencia es secundaria en este plano. Bogotá, D.C. y ciudades como Ibagué y Cartago se ubican en zonas más neutrales, con menor asociación directa con las variables proyectadas. En general, estas dimensiones permiten diferenciar a algunas ciudades con mayores niveles de violencia letal, en contraste con otras que presentan contextos menos afectados por estas problemáticas.
+El biplot correspondiente a las dimensiones 5 (9%) y 6 (8.5%) ofrece una perspectiva complementaria centrada principalmente en variables relacionadas con la seguridad y el bienestar social. La variable Homicidios (H) presenta una alta contribución positiva sobre la Dimensión 5 y destaca como uno de los factores más influyentes en este plano. Su proyección la vincula especialmente con ciudades como Riohacha, Pereira y Cúcuta, lo que sugiere una mayor incidencia de violencia letal en estos territorios. En contraste, Secuestros (S) incide de forma negativa en la Dimensión 6, aunque su peso relativo es más moderado, reflejando un impacto menos dominante en la estructura global del análisis.
+
+Entre las variables con una contribución menor pero aún relevante, se encuentran Cobertura en Salud (CS) y Calidad de los Colegios (CC), cuya influencia aparece más atenuada y dispersa en el gráfico, indicando que su efecto en este plano es secundario o complementario.
+
+En cuanto a las ciudades, Bogotá D.C., Ibagué y Cartago se sitúan cerca del centro del gráfico, en zonas más neutras, lo que indica una baja asociación directa con las variables representadas en estas dimensiones.
+
+En conjunto, estas dimensiones permiten identificar de forma más clara a aquellas ciudades que enfrentan niveles preocupantes de violencia, diferenciándolas de otras con un contexto relativamente más estable en términos de seguridad. La información aquí revelada resulta clave para comprender los matices territoriales de la criminalidad, así como para orientar políticas públicas con enfoques más focalizados.
 
 ### Cosenos cuadrados de los objetos con los factores
 
