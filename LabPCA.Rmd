@@ -16,6 +16,7 @@ date: "2025-05-18"
 
 ```{r setup, include=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
 ```
 
 ## Introduccion
@@ -45,9 +46,400 @@ colnames(RHINT)[2:20] <- c("PC", "TCP","AA","CBPS","CBES","RAP","CC","CPT","CS",
 ```
 
 
+
+## Punto 1
+```{r cars2}
+# Estandarización de datos
+RHINTce <- scale(RHINT[,2:20], scale = TRUE, center = TRUE)
+colnames(RHINTce) <- colnames(RHINT)[2:20]
+rownames(RHINTce) <- RHINT$CIUDADES
+```
+
+Hacemos el PCA de nuestros datos con todas las variables que nos toca en
+nuestro grupo 6 (RH+INT) y observamos nuestros datos con el circulo
+unitario con las dos componentes que capturan mayor varianza de nuestros
+datos.
+
+```{r pressure2, echo=FALSE}
+PCAtodas<-PCA(RHINT[,2:20],scale.unit = T, ncp=7)
+
+```
+
+Los componentes principales se seleccionaron aplicando el criterio de
+Kaiser, que retiene solo aquellos con autovalores mayores a 1, ya que
+estos explican más varianza que una variable individual del conjunto
+original. La tabla muestra los primeros 7 componentes, donde se observa
+que los componentes [X, Y, Z] cumplen este criterio (autovalor \> 1),
+explicando colectivamente un [XX]% de la varianza total. Este enfoque
+garantiza que solo las dimensiones más informativas sean consideradas
+para el análisis, descartando componentes menores que aportarían ruido
+antes que información significativa a los resultados.
+
+El análisis de componentes principales revela que los primeros 7
+componentes explican colectivamente el 86.08% de la varianza total de
+los datos. Destacan especialmente:
+
+Componente 1 (autovalor: 4.36): Captura el 22.96% de la varianza, siendo
+la dimensión más influyente.
+
+Componente 2 (autovalor: 3.69): Explica un 19.40% adicional, acumulando
+42.36% de información.
+
+Componente 3 (autovalor: 2.36): Aporta 12.43%, llegando a 54.78% de
+varianza acumulada.
+
+Siguiendo el criterio de Kaiser (autovalor \> 1), los primeros 6
+componentes son estadísticamente relevantes, ya que explican casi 80% de
+los datos. El componente 7, aunque cumple el criterio, añade solo un
+6.18% adicional. Esto sugiere que, para simplificar el modelo, podríamos
+trabajar con los primeros 6 componentes sin perder información crítica,
+manteniendo un balance entre precisión y parsimonia.
+
+```{r varianza_table, echo=FALSE}
+# Tabla de varianza explicada con índice personalizado
+tabla_varianza <- PCAtodas$eig[1:7, ]
+
+# Personaliza este título/índice
+indice_tabla <- "Tabla 1. Varianza explicada por los componentes principales"
+
+kable(tabla_varianza,
+      caption = indice_tabla,
+      digits = 2,
+      col.names = c("Autovalor", "Varianza (%)", "Varianza Acumulada (%)")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                full_width = FALSE,
+                position = "center") %>%
+  footnote(general = paste("Nota: Se muestran los primeros", nrow(tabla_varianza), 
+                          "componentes que explican el", 
+                          round(sum(tabla_varianza[,2]), 1), 
+                          "% de la varianza total"),
+           number = c("Criterio de selección: Autovalor > 1 (Kaiser)",
+                     paste("Fecha de análisis:", Sys.Date())))
+```
+
+El Análisis de Componentes Principales (ACP) revela la estructura
+subyacente de los datos a través de correlaciones entre las variables
+originales y los componentes extraídos. La tabla proporcionada muestra
+estas correlaciones, donde valores cercanos a 1 o -1 indican relaciones
+fuertes. Los primeros tres componentes destacan por su relevancia: el
+**Componente 1** (22.96% de varianza) está fuertemente asociado con
+variables como *Población de la ciudad* (FC: 0.54), *Tasa de Ocupación*
+(RP: 0.45) y *Analfabetismo Absoluto* (AA: 0.49), lo que sugiere que
+representa una dimensión de **desarrollo urbano y acceso a servicios
+básicos**. Este componente es el más significativo, ya que captura la
+mayor proporción de varianza. Por su parte, el **Componente 2** (19.40%
+de varianza) muestra correlaciones elevadas con indicadores educativos
+(*Cobertura bruta en primaria/secundaria* - CBP: 0.98) y económicos
+(*Coeficiente de internacionalización* - CI: 0.97), reflejando un eje de
+**capital humano y apertura económica**. Finalmente, el **Componente 3**
+(12.43% de varianza) se vincula con *Calidad de colegios* (CEB: 0.97) y
+*Diversificación de mercados* (TC: 0.94), apuntando a una dimensión de
+**calidad educativa y diversificación productiva**.
+
+Además, el **Componente 4** (10.65% de varianza) parece relacionarse con
+variables de seguridad ciudadana, como *Violencia Intrafamiliar* (VI:
+0.34) y *Homicidios* (I: 0.27), aunque con correlaciones más modestas.
+Un hallazgo clave es que las variables educativas y económicas tienden a
+agruparse en componentes distintos, lo que indica que representan
+dimensiones independientes en el análisis. Las correlaciones más altas
+(\>0.7) en los componentes 2 y 3 sugieren que estas variables comparten
+información y podrían simplificarse sin pérdida significativa de datos.
+En conjunto, los primeros tres componentes resumen el **54.78% de la
+varianza total**, ofreciendo una representación concisa de las
+dimensiones críticas: desarrollo urbano (1), educación y comercio (2), y
+calidad productiva (3). Esta simplificación permite un análisis más
+eficiente, manteniendo la esencia de la información original. Para
+futuros estudios, podría explorarse cómo estos componentes se relacionan
+con indicadores de bienestar o crecimiento regional.
+
+```{r corr_table, echo=FALSE}
+# Tabla de correlaciones variables-componentes
+kable(PCAtodas$var$cor, 
+      caption = "Matriz de correlaciones entre variables y componentes principales",
+      col.names = paste0("Comp.", 1:ncol(PCAtodas$var$cor)),
+      digits = 2) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE,
+                font_size = 11,
+                position = "center") %>%
+  row_spec(0, bold = TRUE, background = "#f7f7f7") %>%
+  column_spec(1, bold = TRUE) %>%
+  footnote(general = "Valores representan coeficientes de correlación entre -1 y 1. Correlaciones > |0.5| se consideran significativas.")
+```
+
+La **Dimensión 1 (X)** emerge como el eje principal, dominado por
+variables de *capacidad productiva y escala urbana*: la fuerte
+correlación de **MP (0.94)** y **PC (0.94)** sugiere que las ciudades
+con mayor población (PC) concentran actividades económicas intensivas
+(MP), reflejando un eje de *"tamaño económico-demográfico"*. En
+contraste, la **Dimensión 2 (Y)** muestra un patrón más difuso, con
+correlaciones débiles a moderadas en variables como **DM(0.22)** y **TCP (0.12)**,
+indicando una dimensión secundaria
+de *"dinamismo básico"*, menos estructurada y posiblemente ligada a
+características socioinstitucionales o de crecimiento incremental. El
+contraste revela que el desarrollo urbano (X) se desacopla parcialmente
+de factores como cobertura en salud (CRR) o tasas de crecimiento (TCP)
+(Y), sugiriendo que las ciudades pueden escalar su producción sin
+necesariamente mejorar en indicadores sociales. Esta ortogonalidad
+invita a explorar políticas diferenciadas:
+
+```{r grafico_var_dim12, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.width=10, fig.height=6, fig.cap="Gráfico de variables (Dim.1 vs Dim.2) - Análisis PCA"}
+# Gráfico de variables para Dim.1 vs Dim.2 (optimizado)
+fviz_pca_var(PCAtodas, 
+             axes = c(1, 2),                # Dimensiones 1 y 2 (ejes principales)
+             col.var = "contrib",           # Color por contribución a las dimensiones
+             gradient.cols = c("#2E9FDF", "#E7B800", "#D55E00"),  # Gradiente azul-amarillo-rojo
+             repel = TRUE,                  # Textos inteligentes sin solapamiento
+             alpha.var = "contrib",         # Transparencia según contribución
+             title = "Mapa de Variables - PCA (Dimensión 1 vs Dimensión 2)") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+    legend.position = "right",
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12)
+  ) 
+```
+
+La comparación entre **Dim.1** (eje X) y **Dim.3** (eje Y) revela que
+**Dim.1** agrupa las variables con mayor peso estructural en el
+análisis, como **Población de la ciudad**, **Tasa de Crecimiento de la
+Población**, **Homicidios**, y **Balanza comercial/PIB**, que explican
+la mayor varianza del sistema. Estas variables están asociadas a
+dinámicas macroeconómicas y demográficas dominantes. Por otro lado,
+**Dim.3** resalta patrones menos evidentes pero críticos, como
+**Violencia Intrafamiliar**, **Secuestros**, **Cobertura en salud** y
+**Mortalidad Infantil**, que muestran dispersión vertical, indicando que
+su comportamiento no está completamente capturado por Dim.1.
+
+Por ejemplo, mientras **Homicidios** y **Balanza comercial/PIB** tienen
+altas contribuciones en Dim.1, **Violencia Intrafamiliar** y
+**Secuestros** destacan en Dim.3, sugiriendo que estos últimos responden
+a factores sociales o institucionales distintos a los económicos.
+Variables como **Cobertura bruta en educación superior** y **Relación
+alumno-profesor** aparecen en posiciones intermedias, lo que indica que
+su influencia es compartida entre ambas dimensiones. Este contraste
+permite identificar que **Dim.1** refleja tendencias estructurales
+(económicas/demográficas), mientras que **Dim.3** expone problemáticas
+sociales y de seguridad que requieren atención específica.
+
+```{r graficos_dim13_variables, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.width=10, fig.height=6}
+# Cargar librerías (si no están cargadas previamente)
+library(FactoMineR)
+library(factoextra)
+library(ggplot2)
+
+# Gráfico de VARIABLES para Dim.1 vs Dim.3 (solo este gráfico)
+fviz_pca_var(PCAtodas, 
+             axes = c(1, 3),       # Dimensiones 1 y 3
+             col.var = "contrib",   # Color por contribución
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE,          # Evita solapamiento de etiquetas
+             title = "Variables - PCA (Dimensión 1 vs Dimensión 3)") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))  # Título centrado y en negrita
+```
+
+Al analizar **Dim.2** (eje X) y **Dim.3** (eje Y), se observa que
+**Dim.2** captura variables vinculadas a **educación** y **comercio
+exterior**, como **Cobertura bruta en primaria y secundaria**, **Calidad
+de los colegios**, **Diversificación de los productos**, y **Tasa de
+orientación exportadora**, que representan una segunda capa de
+variabilidad relacionada con capital humano e integración económica. En
+cambio, **Dim.3** sigue resaltando variables de **seguridad pública** y
+**salud**, como **Delitos contra la formación sexual**, **Mortalidad
+Infantil**, y **Cobertura en salud**, que no están fuertemente
+correlacionadas con Dim.2.
+
+
+```{r PCA-Dim1-vs-Dim3, echo=TRUE, message=FALSE, warning=FALSE}
+# Cargar paquetes necesarios
+library(factoextra)
+library(gridExtra)
+
+# Gráfico de variables para Dim.1 vs Dim.3
+grafico_var_dim13 <- fviz_pca_var(PCAtodas, 
+                                 axes = c(1, 3),  # Selecciona dimensiones 1 y 3
+                                 col.var = "contrib", 
+                                 gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+                                 repel = TRUE,
+                                 title = "Variables - Dim.1 vs Dim.3") +
+  theme_minimal()
+
+# Gráfico de individuos para Dim.1 vs Dim.3
+grafico_ind_dim13 <- fviz_pca_ind(PCAtodas, 
+                                 axes = c(1, 3),  # Selecciona dimensiones 1 y 3
+                                 col.ind = "cos2",
+                                 gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+                                 repel = TRUE,
+                                 title = "Individuos - Dim.1 vs Dim.3") +
+  theme_minimal()
+
+# Combinar ambos gráficos
+grid.arrange(grafico_var_dim13, grafico_ind_dim13, nrow = 1)
+```
+
+Un hallazgo clave es que **Dim.2** separa claramente las variables
+educativas (ej. **Capacitación para el trabajo**) de las comerciales
+(ej. **Dinámica de las exportaciones**), mientras que **Dim.3** aísla
+problemáticas como **Violencia Intrafamiliar**, que no dependen
+directamente de los ejes económicos o educativos. Por ejemplo,
+**Analfabetismo Absoluto** y **Cobertura bruta en educación superior**
+tienen pesos similares en Dim.2, pero **Violencia Intrafamiliar** emerge
+como un outlier en Dim.3, sugiriendo que su drivers son independientes.
+En conclusión, **Dim.2** complementa a Dim.1 al explicar aspectos de
+productividad y desarrollo humano, mientras que **Dim.3** revela
+desafíos sociales críticos que requieren políticas focalizadas.
+
+```{r biplot}
+fviz_pca_biplot(PCAtodas)
+```
+
+El biplot generado a partir del Análisis de Componentes Principales
+(ACP) para las dimensiones 1 y 2 proporciona una visión integral de cómo
+se relacionan 21 ciudades colombianas con un conjunto de variables
+socioeconómicas y demográficas. La Dimensión 1 explica el 23% de la
+varianza total, mientras que la Dimensión 2 explica el 19.4%, sumando
+así un 42.4% de la variabilidad de los datos. Las variables están
+representadas por vectores que indican su grado de influencia y
+dirección en el espacio reducido de la ACP, y las ciudades están
+simbolizadas por números del 1 al 21, previamente asignados.
+
+En este gráfico, se observa que variables como la Diversificación de los
+Productos (DP), la Tasa de Orientación Exportadora (TOE), la Población
+de la Ciudad (PC), y la Cobertura Bruta en Educación Superior (CBES)
+están altamente correlacionadas con la Dimensión 1 y orientadas hacia el
+lado derecho del gráfico. Esto sugiere que las ciudades ubicadas en esa
+misma dirección tienden a tener mejores indicadores en estos aspectos.
+En particular, la ciudad número 3 (Bogotá, D.C.) se proyecta en esa
+dirección, lo que podría interpretarse como un reflejo de su perfil más
+desarrollado, tanto en términos de población como de apertura comercial
+y educativa.
+
+En contraste, variables como Analfabetismo Absoluto (AA), Tasa de
+Crecimiento de la Población (TCP), Relación Alumno-Profesor (RAP), y
+Mortalidad Infantil (MI) están más asociadas a la parte izquierda y
+superior del gráfico. Estas variables podrían reflejar condiciones más
+precarias o desafíos sociales persistentes. Ciudades como la número 16
+(Riohacha) y la 22 (Sincelejo) se ubican en esos cuadrantes, lo que
+sugiere que enfrentan mayores retos en educación, salud y crecimiento
+poblacional descontrolado.
+
+La ciudad número 6 (Cartago), por ejemplo, aparece en el cuadrante
+superior derecho, cercana a variables como el Coeficiente de
+Internacionalización (CI), lo cual podría indicar una apertura económica
+relativamente alta. Mientras tanto, ciudades como la 12 (Neiva) o la 20
+(Tunja) están ubicadas cerca del centro, lo que implica perfiles
+socioeconómicos más equilibrados o mixtos.
+
+El biplot también permite identificar agrupamientos y contrastes:
+Medellín (ciudad 10) y Cali (ciudad 5) se ubican cerca de Bogotá (ciudad
+3), sugiriendo similitudes en su desarrollo, mientras que Popayán (15),
+San Andrés (17) y Valledupar (21) aparecen en posiciones más alejadas,
+indicando trayectorias diferentes en términos de sus principales
+indicadores.
+
+En conjunto, este análisis multivariado ayuda a visualizar la
+heterogeneidad regional de las ciudades colombianas en función de
+factores clave como educación, salud, comercio y violencia.
+
+
+```{r biplotcol}
+fviz_pca_biplot(PCAtodas, 
+                axes = c(1, 3),  # Dim.1 (X) vs Dim.3 (Y)
+                col.var = "#FF7F00",  # Color naranja para variables
+                ggtheme = theme_bw(),  # Fondo blanco/gris
+                title = "Biplot PCA: Dim.1 vs Dim.3")
+```
+
+
+El biplot del Análisis de Componentes Principales (ACP) que representa
+las dimensiones 1 y 3 proporciona una perspectiva complementaria al
+análisis anterior. La Dimensión 1 explica el 23% de la varianza,
+mientras que la Dimensión 3 aporta un 12.4%, sumando un total de 35.4%.
+En este gráfico, los vectores de las variables indican su grado de
+influencia y dirección, mientras que las ciudades están representadas
+por números del 1 al 21, ya previamente identificados.
+
+Las variables que se proyectan hacia la derecha del gráfico —como
+Diversificación de los Mercados (DM), Población de la Ciudad (PC),
+Cobertura Bruta en Educación Superior (CBES) y Calidad de los Colegios
+(CC)— muestran una fuerte asociación con la Dimensión 1. Esto sugiere
+que ciudades como la 3 (Bogotá), la 5 (Cali) y la 7 (Medellín), situadas
+en la misma dirección, tienden a tener un mejor desempeño en esos
+indicadores relacionados con desarrollo educativo y económico.
+
+En cambio, las variables como Analfabetismo Absoluto (AA), Tasa de
+Crecimiento de la Población (TCP), Delitos contra la Formación Sexual
+(DCFS), y la Relación Alumno-Profesor (RAP) están orientadas hacia el
+cuadrante superior izquierdo, reflejando condiciones más desafiantes en
+educación y seguridad. Las ciudades número 16 (Riohacha) y 22
+(Sincelejo) aparecen alejadas en esa misma dirección, indicando un
+perfil más rezagado en estas dimensiones.
+
+La Dimensión 3, aunque explica una menor parte de la varianza, ayuda a
+discriminar variables como Capacitación para el Trabajo (CPT),
+Secuestros (S) y el Coeficiente de Internacionalización (CI), que se
+proyectan en la parte inferior del gráfico. Algunas ciudades como la 17
+(San Andrés) y la 6 (Cartago) se ubican en esta zona, lo que podría
+indicar condiciones particulares en estas variables.
+
+En resumen, este biplot permite analizar de forma más precisa las
+diferencias estructurales entre ciudades, resaltando tanto las
+fortalezas como las debilidades en dimensiones clave del desarrollo
+urbano, educativo y económico.
+
+```{r setup 1}
+fviz_pca_biplot(PCAtodas, 
+                axes = c(2, 3),  # Dim.2 (X) vs Dim.3 (Y)
+                col.var = "#FF7F00",  # Color naranja para variables
+                ggtheme = theme_bw(),  # Fondo blanco/gris
+                title = "Biplot PCA: Dim.2 vs Dim.3")
+```
+
+Este biplot del Análisis de Componentes Principales (ACP), que
+representa las dimensiones 2 y 3, permite examinar cómo se relacionan
+las variables y las 21 ciudades colombianas en un espacio definido por
+el 19.4% (Dimensión 2) y el 12.4% (Dimensión 3) de la varianza total, lo
+que suma un 31.8%. En este gráfico, los vectores representan las
+variables y su influencia en las ciudades (números del 1 al 21).
+
+En el cuadrante superior derecho se ubican variables como Analfabetismo
+Absoluto (AA), Tasa de Crecimiento de la Población (TCP), Relación
+Alumno-Profesor (RAP) y Mortalidad Infantil (MI), que apuntan a
+condiciones estructurales más críticas en educación y salud. Las
+ciudades cercanas a este sector, como la 16 (Riohacha) y la 3 (Bogotá,
+aunque más centrada), muestran asociación con estas variables, lo cual
+podría reflejar la persistencia de retos sociales incluso en grandes
+urbes.
+
+En sentido opuesto, en la parte inferior derecha se encuentran variables
+como Tasa de Orientación Exportadora (TOE), Diversificación de los
+Productos (DP), y Coeficiente de Internacionalización (CI), que están
+alineadas con una mayor apertura económica y diversidad productiva. La
+ciudad número 6 (Cartago), que se proyecta fuertemente en esta
+dirección, podría estar destacando en estos aspectos.
+
+En el lado izquierdo del gráfico, las variables como Calidad de los
+Colegios (CC), Violencia Intrafamiliar (VI), y Balanza Comercial/PIB
+(BCPIB) aparecen más relacionadas con las ciudades 20 (Tunja), 13
+(Pasto) y 4 (Bucaramanga), indicando dinámicas mixtas en materia de
+desarrollo educativo y social.
+
+Por último, en la parte inferior izquierda aparecen variables como
+Secuestros (S) y Capacitación para el Trabajo (CPT), con ciudades como
+la 17 (San Andrés) y la 14 (Pereira) asociadas a esas dimensiones.
+
+Este análisis complementa los anteriores al ofrecer una nueva
+perspectiva sobre cómo se distribuyen las ciudades en función de otras
+combinaciones de variables clave, revelando contrastes entre rezago
+social, apertura económica y calidad educativa
+
+
+
 ## Punto 2.
 
-## 2. Preparación de datos
+## Preparación de datos
 
 Seleccionamos las variables activas (internacionalización) y las variables ilustrativas (recursos humanos).
 
@@ -57,13 +449,15 @@ base_acp <- RHINT[, c("BCPIB", "CI", "TOE", "DP", "DM",
                       "CPT", "CS", "MI", "DCFS", "VI", "H", "S")]
 ```
 
-## 3. Análisis de Componentes Principales (ACP)
+## Análisis de Componentes Principales (ACP)
 
 ```{r}
 res.pca <- PCA(base_acp, scale.unit = TRUE, quanti.sup = 6:19, graph = FALSE)
 ```
 
-## 4. Resultados
+
+
+## Resultados
 
 ### a) Valores propios
 
@@ -74,6 +468,27 @@ kable(eig.val, format = "latex", booktabs = TRUE,
   kable_styling(latex_options = c("striped", "hold_position"))
 ```
 
+El Análisis de Componentes Principales (ACP) realizado sobre las métricas activas de internacionalización y los indicadores de recursos humanos como variables suplementarias, permite identificar dos dimensiones 
+fundamentales que explican el 85,4% de la variabilidad total en los datos:
+
+#### Dimensión 1 – Grado de apertura y dinamismo internacional (62,2%)
+
+Esta dimensión resume el eje de *expansión económica internacional*. Las ciudades que obtienen puntajes positivos destacan por:
+
+- Alto Coeficiente de internacionalización: reflejo de una participación activa en redes globales.
+- Elevada Tasa de orientación exportadora: indica una economía volcada hacia el mercado externo.
+- Diversificación de productos exportados: sugiere solidez estructural y menor vulnerabilidad frente a choques externos.
+
+Por otro lado, las ciudades con superávit en la Balanza comercial respecto al PIB tienden a ubicarse en el extremo izquierdo de esta dimensión. Aunque exhiben cuentas externas equilibradas, presentan *menor dinamismo exportador*, lo que podría reflejar un perfil más conservador o dependiente de pocos sectores clave.
+
+#### Dimensión 2 – Cobertura educativa y calidad vs. déficits sociales (23,2%)
+
+Esta dimensión expresa un contraste entre cobertura/calidad educativa y factores demográficos y sociales rezagados. En el polo positivo, se agrupan ciudades que combinan superávit comercial con una alta 
+diversificación de mercados. Estas ciudades reflejan un patrón de estabilidad macroeconómica acompañado de una proyección internacional balanceada. Por el contrario, en el polo negativo se encuentran ciudades 
+con una elevada Tasa de orientación exportadora, pero que enfrentan déficits en áreas como salud, educación o estructura demográfica. Esto sugiere estrategias intensivas en exportaciones, pero sin una base 
+social suficientemente equilibrada, lo cual puede comprometer su sostenibilidad a largo plazo.
+
+
 ### b) Correlaciones de variables activas
 
 ```{r}
@@ -82,6 +497,20 @@ kable(round(res.pca$var$cor, 3), format = "latex",
       caption = "Correlación de variables activas con los factores") %>%
   kable_styling(latex_options = c("striped", "hold_position"))
 ```
+
+### Dimensión 1 (62,2 \%): “Apertura económica ↔ Violencia y desequilibrios”
+
+Esta dimensión revela un eje fundamental que contrasta el nivel de apertura económica de las ciudades con ciertas condiciones sociales y demográficas. A medida que una ciudad presenta mayores niveles de internacionalización, tiende también a registrar patrones específicos tanto en su estructura poblacional como en la calidad de vida de sus habitantes.
+
+- En el extremo positivo de la dimensión se encuentran ciudades con mayor población (RH\_1 = 0{,}397) y mejores niveles de cobertura educativa, tanto en primaria/secundaria (RH\_6 = 0{,}163) como en educación superior (RH\_7 = 0{,}246). Esto sugiere que las urbes más integradas al comercio internacional no solo son más grandes, sino que también ofrecen mejores oportunidades educativas.
+
+  También se observan correlaciones positivas, aunque moderadas, con la mortalidad infantil (RH\_12 = 0{,}168) y los homicidios (RH\_15 = 0{,}169). Estos resultados podrían explicarse por el tamaño y complejidad de estas ciudades, que aunque dinámicas, enfrentan desafíos sociales propios de entornos urbanos densos.
+
+- En el polo negativo de la dimensión destacan aquellas ciudades con menores índices de violencia intrafamiliar (RH\_14 = –0{,}308), secuestros (RH\_16 = –0{,}273) y delitos contra la formación sexual (RH\_13 = –0{,}270). Esto indicaría que las ciudades más orientadas hacia los mercados globales ofrecen contextos más seguros en estos aspectos sensibles.
+
+  Además, se encuentran asociaciones negativas con la tasa de crecimiento de la población (RH\_2 = –0{,}154) y con el analfabetismo absoluto (RH\_5 = –0{,}057), lo que sugiere que las economías menos abiertas presentan un crecimiento poblacional más acelerado, pero a la vez mayores rezagos educativos.
+
+En síntesis, la Dimensión 1 no solo captura el grado de apertura y diversificación económica de las ciudades, sino que también permite distinguir entre aquellas que logran combinar su vocación exportadora con condiciones sociales más estables, seguras y con mejores niveles de educación.
 
 ### c) Correlaciones de variables ilustrativas
 
@@ -92,7 +521,40 @@ kable(round(res.pca$quanti.sup$cor, 3), format = "latex",
   kable_styling(latex_options = c("striped", "hold_position"))
 ```
 
-## 5. Visualizaciones
+### Dimensión 1 (62,2 % de la varianza)
+
+Este eje asocia la apertura internacional con mejores condiciones sociales. Las ciudades con mayor dinamismo económico y vínculos con el comercio exterior tienden a presentar patrones consistentes en términos de tamaño poblacional, cobertura educativa y menores niveles de ciertos delitos.
+
+- Entre las correlaciones positivas se destacan:
+
+  - La población de la ciudad (PC, 0,397) y la cobertura educativa, tanto en niveles de primaria/secundaria (CBPS, 0,163) como en educación superior (CBES, 0,246). Estos resultados sugieren que las ciudades más internacionalizadas tienden a ser más grandes y con mayor cobertura escolar.
+
+  - También se observan correlaciones positivas con la mortalidad infantil (MI, 0,168) y los homicidios (H, 0,169). Esto podría reflejar los desafíos propios de ciudades densamente pobladas, donde el crecimiento económico se acompaña de una mayor complejidad social.
+
+- Entre las correlaciones negativas se encuentran:
+
+  - Indicadores de violencia como la violencia intrafamiliar (VI, –0,308), los secuestros (S, –0,273) y los delitos contra la formación sexual (DCFS, –0,270). En general, estos resultados apuntan a que las ciudades más integradas al comercio internacional presentan contextos más seguros en estos aspectos.
+
+  - Finalmente, se identifican relaciones negativas con la tasa de crecimiento de la población (TCP, –0,154) y el analfabetismo absoluto (AA, –0,057), lo que sugiere que las regiones con menor apertura económica suelen tener dinámicas poblacionales más aceleradas, pero también mayores rezagos en términos educativos.
+
+### Dimensión 2 (23,2 % de la varianza)
+
+Este eje discrimina un “polo educativo” frente a contextos con mayores presiones demográficas. La dimensión revela que aquellas ciudades con mejor infraestructura formativa y mayor cobertura educativa tienden a reunir condiciones más favorables en términos sociales, incluso cuando enfrentan retos de tamaño y complejidad urbana.
+
+- Las correlaciones positivas más destacadas se observan con:
+
+  - La cobertura en educación superior (CBES, 0,706) y la calidad de los colegios (CC, 0,577), que definen claramente un patrón educativo robusto.
+
+  - También se correlacionan positivamente la población de la ciudad (PC, 0,583) y, en menor medida, la cobertura en salud (CS, 0,340) y los homicidios (H, 0,219). Estos resultados indican que las ciudades con mejor formación tienden a contar con una mejor infraestructura de servicios y, paradójicamente, con niveles moderados de violencia.
+
+- Entre las correlaciones negativas se encuentran:
+
+  - El analfabetismo absoluto (AA, –0,435) y la tasa de crecimiento de la población (TCP, –0,387), lo cual sugiere que los entornos con mayores presiones demográficas suelen estar acompañados por mayores déficits educativos.
+
+  - La mortalidad infantil (MI, –0,319), indicando que una mayor cobertura educativa también se asocia con una reducción de las tasas de mortalidad infantil, consolidando así el perfil social más favorable de los polos formativos.
+
+
+## Visualizaciones
 
 ### a) Mapa de variables
 
@@ -111,6 +573,17 @@ fviz_pca_biplot(res.pca, repel = TRUE,
 ```
 
 
+### Distribución de ciudades en el plano factorial
+
+Las ciudades se distribuyen conforme a dos ejes claros: la apertura internacional (Dimensión 1) y el desarrollo social y educativo (Dimensión 2).
+
+En el cuadrante superior derecho se ubican urbes como la 3, 5 y 10, que combinan una elevada diversificación de mercados y dinamismo exportador (INT\_67, INT\_70, INT\_68), junto con altos niveles de cobertura en educación superior (RH\_7), calidad de colegios (RH\_9) y cobertura en salud (RH\_11).
+
+En el cuadrante inferior derecho, la ciudad 6 se alinea con una alta tasa de orientación exportadora y un elevado coeficiente de internacionalización (INT\_68–INT\_67), aunque también presenta tasas elevadas de analfabetismo (RH\_5) y crecimiento poblacional (RH\_2), lo cual señala ciertas tensiones sociales.
+
+En el cuadrante superior izquierdo aparecen localidades como la 4 y la 8, que exhiben economías con superávit comercial (INT\_66) y buena cobertura en primaria/secundaria (RH\_6), sin énfasis en la expansión exportadora.
+
+Por último, en el cuadrante inferior izquierdo, donde se agrupan las ciudades 11, 12 y 17, se observa proximidad a indicadores como violencia intrafamiliar (RH\_14), secuestros (RH\_16) y delitos sexuales (RH\_13), lo cual refleja contextos de menor internacionalización y mayores riesgos sociales.
 
 
 ## Punto 3.
