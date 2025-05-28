@@ -56,6 +56,160 @@ colnames(RHINT)[2:20] <- c("PC", "TCP","AA","CBPS","CBES","RAP","CC",
 
 ---
 
+
+## Punto 1
+
+### Estandarización de datos
+
+```{r cars2}
+
+RHINTce <- scale(RHINT[,2:20], scale = TRUE, center = TRUE)
+colnames(RHINTce) <- colnames(RHINT)[2:20]
+rownames(RHINTce) <- RHINT$CIUDADES
+```
+
+Hacemos el PCA de nuestros datos con todas las variables que nos toca en
+nuestro grupo 6 (RH+INT) y observamos nuestros datos con el circulo
+unitario con las dos componentes que capturan mayor varianza de nuestros
+datos.
+
+---
+
+\vspace{5em}
+```{r pressure2, echo=FALSE}
+PCAtodas<-PCA(RHINT[,2:20],scale.unit = T, ncp=7)
+
+```
+
+---
+
+\vspace{-22em}
+```{r pressure23, echo=FALSE}
+PCAtodas<-PCA(RHINT[,2:20],scale.unit = T, ncp=7)
+
+```
+
+---
+
+#### Selección de Componentes Principales:
+
+Aplicamos el criterio de Kaiser (autovalor > 1), reteniendo solo los componentes más informativos.
+
+- 6 componentes cumplieron el criterio, explicando ~80% de la varianza total.
+
+- El componente 7 (6.2% adicional) podría omitirse para simplificar el modelo sin perder información crítica.
+
+Varianza explicada:
+
+- Componente 1: 23.0% (autovalor: 4.36)
+
+- Componente 2: 19.4% (autovalor: 3.69)
+
+- Componente 3: 12.4% (autovalor: 2.36)
+
+Total acumulado (3 primeros): 54.8%
+
+
+
+---
+
+### Tabla de varianza explicada con índice personalizado
+
+```{r varianza_table, echo=FALSE}
+# Tabla de varianza explicada con índice personalizado
+tabla_varianza <- PCAtodas$eig[1:7, ]
+
+# Personaliza este título/índice
+indice_tabla <- "Tabla 1. Varianza explicada por los componentes principales"
+
+kable(tabla_varianza,
+      caption = indice_tabla,
+      digits = 2,
+      col.names = c("Autovalor", "Varianza (%)", "Varianza Acumulada (%)"),
+      format = "latex",
+      booktabs = TRUE) %>%
+  kable_styling(
+    latex_options = c("scale_down", "hold_position", "striped"),
+    font_size = 8,
+    position = "center"
+  ) %>%
+  row_spec(0, bold = TRUE) %>%
+  footnote(
+    general = paste("Nota: Se muestran los primeros", nrow(tabla_varianza), 
+                    "componentes que explican el", 
+                    round(sum(tabla_varianza[,2]), 1), 
+                    "% de la varianza total"),
+    number = c("Criterio de selección: Autovalor > 1 (Kaiser)",
+               paste("Fecha de análisis:", format(Sys.Date(), "%d/%m/%Y")))
+  )
+
+```
+
+---
+
+\scriptsize
+##### Componente 1 (22.96% varianza):
+
+- Variables: Población (0.54), Tasa de Ocupación (0.45), Analfabetismo (0.49).
+
+- Interpretación: Eje de desarrollo urbano y acceso a servicios básicos.
+
+##### Componente 2 (19.40% varianza):
+
+- Variables: Cobertura educativa (0.98), Internacionalización (0.97).
+
+- Interpretación: Capital humano y apertura económica.
+
+##### Componente 3 (12.43% varianza):
+
+- Variables: Calidad educativa (0.97), Diversificación de mercados (0.94).
+
+- Interpretación: Calidad educativa y diversificación productiva.
+
+##### Hallazgos Principales:
+
+- Los 3 primeros componentes resumen el 54.78% de la varianza total.
+
+- Variables educativas y económicas forman dimensiones independientes.
+
+- Correlaciones >0.7 en componentes 2 y 3 permiten simplificar el modelo sin pérdida crítica de información.
+
+---
+
+### Tabla de correlaciones variables componentes
+
+```{r corr_table, echo=FALSE}
+# Tabla de correlaciones variables-componentes
+kable(PCAtodas$var$cor, 
+      caption = "Matriz de correlaciones entre variables y componentes principales",
+      col.names = paste0("Comp.", 1:ncol(PCAtodas$var$cor)),
+      digits = 2) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE,
+                font_size = 11,
+                position = "center") %>%
+  row_spec(0, bold = TRUE, background = "#f7f7f7") %>%
+  column_spec(1, bold = TRUE) %>%
+  footnote(general = "Valores representan coeficientes de correlación entre -1 y 1. Correlaciones > |0.5| se consideran significativas.")
+```
+
+
+---
+
+##### Dimensión 1 (X) - Eje principal
+- Variables clave: MP (0.94), PC (0.94)
+- Interpretación: Eje "tamaño económico-demográfico" donde ciudades más pobladas concentran mayor actividad económica.
+
+##### Dimensión 2 (Y) - Eje secundario
+-  Variables débiles: DM (0.22), TCP (0.12)
+- Interpretación: "Dinamismo básico" menos estructurado, vinculado a crecimiento incremental.
+
+##### Hallazgo crítico:
+- El desarrollo económico (X) no garantiza mejoras en indicadores sociales (Y), requiriendo políticas diferenciadas.
+
+
+---
+
 ## Punto 2
 Utilizar la función PCA del paquete FactoMiner para realizar un ACO con todas las varibales especificas del grupo utilizando cmo ilustrativas las variables de Recursos Humanos.
 
