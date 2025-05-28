@@ -179,17 +179,15 @@ kable(tabla_varianza,
 ### Tabla de correlaciones variables componentes
 
 ```{r corr_table, echo=FALSE}
-# Tabla de correlaciones variables-componentes
-kable(PCAtodas$var$cor, 
+# Tabla de correlaciones variables-componentes (solo para PDF/Beamer)
+kable(PCAtodas$var$cor,
       caption = "Matriz de correlaciones entre variables y componentes principales",
       col.names = paste0("Comp.", 1:ncol(PCAtodas$var$cor)),
-      digits = 2) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
-                full_width = FALSE,
-                font_size = 11,
-                position = "center") %>%
-  row_spec(0, bold = TRUE, background = "#f7f7f7") %>%
-  column_spec(1, bold = TRUE) %>%
+      digits = 2,
+      format = "latex",
+      booktabs = TRUE) %>%
+  kable_styling(latex_options = c("scale_down", "hold_position")) %>%
+  row_spec(0, bold = TRUE) %>%
   footnote(general = "Valores representan coeficientes de correlación entre -1 y 1. Correlaciones > |0.5| se consideran significativas.")
 ```
 
@@ -206,6 +204,328 @@ kable(PCAtodas$var$cor,
 
 ##### Hallazgo crítico:
 - El desarrollo económico (X) no garantiza mejoras en indicadores sociales (Y), requiriendo políticas diferenciadas.
+
+---
+
+```{r grafico_var_dim12, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.width=10, fig.height=6, fig.cap="Gráfico de variables (Dim.1 vs Dim.2) - Análisis PCA"}
+# Gráfico de variables para Dim.1 vs Dim.2 (optimizado)
+fviz_pca_var(PCAtodas, 
+             axes = c(1, 2),                # Dimensiones 1 y 2 (ejes principales)
+             col.var = "contrib",           # Color por contribución a las dimensiones
+             gradient.cols = c("#2E9FDF", "#E7B800", "#D55E00"),  # Gradiente azul-amarillo-rojo
+             repel = TRUE,                  # Textos inteligentes sin solapamiento
+             alpha.var = "contrib",         # Transparencia según contribución
+             title = "Mapa de Variables - PCA (Dimensión 1 vs Dimensión 2)") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+    legend.position = "right",
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12)
+  ) 
+```
+
+---
+
+\scriptsize
+##### Dimensión 1 (Estructural):
+- Variables clave: Población, Crecimiento poblacional, Homicidios, Balanza comercial/PIB
+- Interpretación: Eje económico-demográfico dominante (mayor varianza explicada)
+
+##### Dimensión 3 (Social/Seguridad):
+- Variables críticas: Violencia intrafamiliar, Secuestros, Cobertura en salud, Mortalidad infantil
+- Interpretación: Problemáticas sociales con dinámica independiente del desarrollo económico
+
+##### Hallazgos clave:
+- Las variables educativas (ej. Cobertura educación superior) muestran influencia compartida
+- Contraste fundamental: Desarrollo económico (Dim.1) ≠ Mejora en seguridad/salud (Dim.3)
+- Implica necesidad de políticas diferenciadas para cada dimensión
+
+---
+
+
+```{r graficos_dim13_variables, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.width=10, fig.height=6}
+# Cargar librerías (si no están cargadas previamente)
+library(FactoMineR)
+library(factoextra)
+library(ggplot2)
+
+# Gráfico de VARIABLES para Dim.1 vs Dim.3 (solo este gráfico)
+fviz_pca_var(PCAtodas, 
+             axes = c(1, 3),       # Dimensiones 1 y 3
+             col.var = "contrib",   # Color por contribución
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE,          # Evita solapamiento de etiquetas
+             title = "Variables - PCA (Dimensión 1 vs Dimensión 3)") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))  # Título centrado y en negrita
+```
+
+---
+
+\scriptsize
+##### Dimensión 2 (Educación/Comercio):
+- Variables clave:
+
+  - Cobertura educativa básica
+
+  - Calidad escolar
+
+  - Diversificación productiva
+
+  - Orientación exportadora
+  - Interpretación: Eje de capital humano e integración económica
+
+##### Dimensión 3 (Seguridad/Salud):
+- Variables críticas:
+
+  - Delitos sexuales
+
+  - Mortalidad infantil
+
+  - Cobertura sanitaria
+  - Interpretación: Problemáticas sociales independientes del desarrollo educativo-comercial
+
+##### Hallazgo clave:
+- Las dimensiones revelan que avances educativos/económicos no garantizan mejoras en seguridad/salud, exigiendo intervenciones específicas para cada ámbito.
+
+---
+
+```{r PCA-Dim1-vs-Dim3, echo=FALSE, message=FALSE, warning=FALSE}
+# Cargar paquetes necesarios
+library(factoextra)
+library(gridExtra)
+
+# Gráfico de variables para Dim.1 vs Dim.3
+grafico_var_dim13 <- fviz_pca_var(PCAtodas, 
+                                 axes = c(1, 3),  # Selecciona dimensiones 1 y 3
+                                 col.var = "contrib", 
+                                 gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+                                 repel = TRUE,
+                                 title = "Variables - Dim.1 vs Dim.3") +
+  theme_minimal()
+
+# Gráfico de individuos para Dim.1 vs Dim.3
+grafico_ind_dim13 <- fviz_pca_ind(PCAtodas, 
+                                 axes = c(1, 3),  # Selecciona dimensiones 1 y 3
+                                 col.ind = "cos2",
+                                 gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+                                 repel = TRUE,
+                                 title = "Individuos - Dim.1 vs Dim.3") +
+  theme_minimal()
+
+# Combinar ambos gráficos
+grid.arrange(grafico_var_dim13, grafico_ind_dim13, nrow = 1)
+```
+
+---
+
+\scriptsize
+##### Dimensión 2 (Educación-Comercio):
+
+- Separa claramente:
+
+  - Variables educativas (Capacitación laboral)
+
+  - Variables comerciales (Dinámica exportadora)
+
+- Muestra correlación entre:
+
+  - Anafabetismo y Cobertura educativa superior
+
+##### Dimensión 3 (Problemáticas Sociales):
+
+- Aísla variables independientes:
+
+  - Violencia intrafamiliar (aparece como outlier)
+
+  - Otras problemáticas sociales
+
+##### Conclusión:
+
+- Dim.2 complementa el análisis económico (Dim.1) con aspectos de capital humano
+
+- Dim.3 revela desafíos sociales que requieren abordaje específico
+
+#### Las dimensiones muestran que:
+
+  - Avances educativos ≠ Mejoras en seguridad
+
+  - Desarrollo económico ≠ Solución automática a problemáticas sociales
+
+---
+
+```{r biplot}
+fviz_pca_biplot(PCAtodas)
+```
+
+---
+
+\scriptsize
+##### Varianza explicada:
+
+- Dim.1: 23% (desarrollo económico)
+
+- Dim.2: 19.4% (capital humano)
+
+- Total: 42.4% de variabilidad
+
+##### Hallazgos clave:
+
+- Perfiles urbanos diferenciados
+
+- Bogotá, Medellín, Cali:
+  - Alto desempeño en:
+
+    - Población (PC)
+
+    - Educación superior (CBES)
+
+    - Apertura comercial (DP, TOE)
+
+- Riohacha, Sincelejo:
+  - Desafíos en:
+
+    - Analfabetismo (AA)
+
+    - Mortalidad infantil (MI)
+
+    - Crecimiento poblacional (TCP)
+
+---    
+
+##### Posiciones intermedias
+
+- Cartago: Destaca en internacionalización (CI)
+
+- Neiva/Tunja: Perfiles socioeconómicos equilibrados
+
+- Agrupamientos reveladores
+
+  - Ciudades principales (3, 5, 10) comparten patrones de desarrollo
+
+  - Ciudades periféricas (15, 17, 21) muestran trayectorias divergentes
+
+##### Conclusión:
+- El biplot evidencia:
+  - Desigualdades regionales marcadas
+  - Relaciones clave entre desarrollo económico y social
+  - Oportunidades para políticas públicas diferenciadas
+
+
+---
+
+\scriptsize
+```{r biplotcol}
+fviz_pca_biplot(PCAtodas, 
+                axes = c(1, 3),  # Dim.1 (X) vs Dim.3 (Y)
+                col.var = "#FF7F00",  # Color naranja para variables
+                ggtheme = theme_bw(),  # Fondo blanco/gris
+                title = "Biplot PCA: Dim.1 vs Dim.3")
+```
+
+---
+
+\scriptsize
+##### Varianza explicada:
+
+  - Dim.1: 23% (desarrollo urbano-educativo)
+
+  - Dim.3: 12.4% (seguridad y empleo)
+
+  - Total: 35.4%
+
+##### Patrones clave:
+
+- Eje de desarrollo (Derecha - Dim.1)
+
+
+- Diversificación de mercados (DM)
+
+- Población (PC)
+
+- Educación superior (CBES)
+
+##### Ciudades destacadas: 
+- Bogotá (3), Cali (5), Medellín (7)
+
+---
+
+\scriptsize
+##### Variables críticas:
+
+- Analfabetismo (AA)
+
+- Delitos sexuales (DCFS)
+
+- Ciudades afectadas: Riohacha (16), Sincelejo (22)
+
+- Dimensión 3 (Inferior)
+
+- Variables diferenciadoras:
+
+- Capacitación laboral (CPT)
+
+- Secuestros (S)
+
+- Casos particulares: San Andrés (17), Cartago (6)
+
+##### Conclusiones:
+
+- Confirma el liderazgo de las principales ciudades en desarrollo
+- Revela problemas estructurales en educación y seguridad
+- Identifica patrones únicos en ciudades intermedias
+
+---
+
+\scriptsize
+```{r setup 1}
+fviz_pca_biplot(PCAtodas, 
+                axes = c(2, 3),  # Dim.2 (X) vs Dim.3 (Y)
+                col.var = "#FF7F00",  # Color naranja para variables
+                ggtheme = theme_bw(),  # Fondo blanco/gris
+                title = "Biplot PCA: Dim.2 vs Dim.3")
+```
+
+---
+
+\scriptsize
+##### Cuadrante superior derecho
+ 
+- Variables críticas:
+  - Analfabetismo (AA)
+  - Mortalidad infantil (MI)
+
+- Ciudades asociadas: Riohacha (16), Bogotá (3)
+
+- Interpretación: Nucleo de desafíos sociales persistentes
+
+##### Cuadrante inferior derecho
+
+- Variables económicas:
+  - Apertura comercial (TOE, DP)
+
+  - Ciudad destacada: Cartago (6)
+
+- Interpretación: Polos de desarrollo económico
+
+---
+
+\scriptsize
+##### Lado izquierdo
+
+- Variables mixtas:
+  - Calidad educativa (CC)
+  - Violencia intrafamiliar (VI)
+
+- Ciudades: Tunja (20), Pasto (13)
+
+- Interpretación: Perfiles socioeducativos contrastantes
+
+##### Hallazgos clave:
+  - Bogotá muestra doble condición: desarrollo con rezagos sociales
+  - Cartago emerge como caso de éxito en apertura económica
+  - San Andrés (17) y Pereira (14) presentan patrones únicos en seguridad y empleo
 
 
 ---
@@ -232,6 +552,7 @@ base_acp <- RHINT[, c("BCPIB", "CI", "TOE", "DP", "DM",
 ```{r}
 res.pca <- PCA(base_acp, scale.unit = TRUE, quanti.sup = 6:19, graph = FALSE)
 ```
+
 ---
 
 ### Resultados
@@ -245,6 +566,39 @@ kable(eig.val, format = "latex", booktabs = TRUE,
       caption = "Valores propios y varianza explicada") %>%
   kable_styling(latex_options = c("striped", "hold_position"))
 ```
+
+---
+
+\scriptsize
+##### Dimensión 1 - Apertura Internacional (62.2%)
+- Eje de competitividad global
+
+- Alta participación en redes globales (Coef. Internacionalización)
+
+- Economía orientada a exportaciones
+
+- Diversificación productiva (resistencia a crisis)
+
+- Superávit comercial pero bajo dinamismo exportador
+
+- Posible dependencia de pocos sectores
+
+##### Dimensión 2 - Equilibrio Social-Educativo (23.2%)
+
+- Contraste entre desarrollo humano y crecimiento económico
+
+- Superávit comercial + diversificación de mercados
+
+- Estabilidad macroeconómica con proyección internacional
+
+- Ciudades con alto volumen exportador pero:
+
+- Déficits en salud/educación
+
+- Estructura demográfica vulnerable
+
+- Riesgo de sostenibilidad a largo plazo
+
 ---
 
 #### b) Correlaciones de variables activas
@@ -256,6 +610,25 @@ kable(round(res.pca$var$cor, 3), format = "latex",
       caption = "Correlación de variables activas con los factores") %>%
   kable_styling(latex_options = c("striped", "hold_position"))
 ```
+
+---
+
+##### Polo Positivo (Ciudades Globalizadas):
+- Mayor población y mejor cobertura educativa (primaria a superior)
+- Dinamismo económico con oportunidades educativas
+- Contraste: Presentan mayores tasas de mortalidad infantil y homicidios (complejidad urbana)
+
+##### Polo Negativo (Ciudades menos Internacionalizadas):
+- Menos violencia (intrafamiliar, secuestros, delitos sexuales)
+- Crecimiento poblacional más acelerado
+- Rezagos educativos (analfabetismo)
+
+##### Hallazgo Clave:
+Las ciudades con mayor apertura global muestran:
+- Mejor educación y seguridad ciudadana
+- Pero enfrentan desafíos en salud pública y violencia
+- Las menos globalizadas tienen crecimiento poblacional sin desarrollo educativo equivalente
+
 ---
 
 #### c) Correlaciones de variables ilustrativas
@@ -267,31 +640,61 @@ kable(round(res.pca$quanti.sup$cor, 3), format = "latex",
       caption = "Correlación de variables ilustrativas con los factores") %>%
   kable_styling(latex_options = c("striped", "hold_position"))
 ```
+
 ---
 
-### Visualizaciones
-
-#### a) Mapa de variables
-\vspace{0em}
 \scriptsize
-```{r, out.width='110%'}
+##### Dimensión 1 (62,2 % de la varianza)
+- Relaciona apertura internacional con mejores condiciones sociales.
+
+- Positivas: ciudades grandes con alta cobertura educativa (CBPS, CBES), pero también con mayores tasas de mortalidad infantil y homicidios.
+
+- Negativas: menor violencia intrafamiliar, secuestros y delitos sexuales; menor analfabetismo y crecimiento poblacional en ciudades más internacionalizadas.
+
+##### Dimensión 2 (23,2 % de la varianza)
+- Distingue un polo educativo frente a contextos con presión demográfica.
+
+- Positivas: alta cobertura en educación superior (CBES), calidad educativa (CC), mayor población, mejor cobertura en salud.
+
+- Negativas: mayor analfabetismo, crecimiento poblacional y mortalidad infantil en contextos con menor desarrollo educativo.
+
+---
+
+\scriptsize
+### Visualizaciones
+#### a) Mapa de variables
+
+
+```{r, out.width='100%', warning=FALSE, message=FALSE, echo=FALSE}
 fviz_pca_var(res.pca, col.var = "cos2", 
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
              repel = TRUE, title = "Variables activas e ilustrativas")
 ```
----
 
 ---
 
-#### b) Biplot
-\vspace{0em}
-\scriptsize
-```{r biplot-beamer-fixed, out.width='110%', warning=FALSE, message=FALSE}
+### b) Biplot
+
+```{r}
 fviz_pca_biplot(res.pca, repel = TRUE, 
                 col.var = "#2E9FDF", col.ind = "#696969",
                 title = "Biplot: ciudades y variables")
 ```
+
 ---
+
+\scriptsize
+##### Distribución de ciudades en el plano factorial
+
+Las ciudades se agrupan según dos ejes: apertura internacional y desarrollo social y educativo.
+
+- Cuadrante superior derecho: Ciudades 3, 5 y 10, con alto dinamismo exportador y buena cobertura en educación y salud.
+
+- Cuadrante inferior derecho: Ciudad 6, muy internacionalizada pero con problemas sociales como analfabetismo y crecimiento acelerado.
+
+- Cuadrante superior izquierdo: Ciudades 4 y 8, con superávit comercial y cobertura educativa básica, pero sin fuerte orientación exportadora.
+
+- Cuadrante inferior izquierdo: Ciudades 11, 12 y 17, asociadas a violencia y bajo nivel de internacionalización.
 
 ---
 
