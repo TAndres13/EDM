@@ -1208,3 +1208,122 @@ fviz_pca_biplot(pcaRHINTce,
   - Ciudades con alta incidencia de homicidios se agrupan claramente
   - Variables de bienestar (CS, CC) tienen influencia secundaria
 
+---
+
+### Cosenos cuadrados de los objetos con los factores
+
+#### Tabla Cosenos Cuadrados en la dimensiones 1 y 2 
+
+```{r cos212, , echo=FALSE, warning=FALSE, results='asis'}
+# Crear un dataframe con todas las métricas
+var_coord <- as.data.frame(round(pcaRHINTce$var$coord, 4))
+var_contrib <- as.data.frame(round(pcaRHINTce$var$contrib, 2))
+var_cos2 <- as.data.frame(round(pcaRHINTce$var$cos2, 4))
+
+# Combinar solo las primeras 2 dimensiones
+var_results <- data.frame(
+  Variable = rownames(var_coord),
+  Coord_Dim1 = var_coord[,1],
+  Coord_Dim2 = var_coord[,2],
+  Contrib_Dim1 = var_contrib[,1],
+  Contrib_Dim2 = var_contrib[,2],
+  Cos2_Dim1 = var_cos2[,1],
+  Cos2_Dim2 = var_cos2[,2]
+)
+
+# Crear la tabla
+knitr::kable(var_results, "latex", booktabs = TRUE, 
+             caption = "Resultados del PCA: Coordenadas, Contribución y Calidad de Representación",
+             label = "pca_results") %>%
+  kableExtra::kable_styling(latex_options = c("striped", "scale_down", "hold_position"))
+
+```
+
+---
+
+##### Dimensiones 1-2
+
+- Dim1: Anafabetismo (AA) (22.9% contribución)
+
+- Dim2: Educación superior (CBES) (23%) y Población (PC) (22.4%)
+
+- Rol: Estructuran el espacio inicial, diferenciando ciudades según desarrollo educativo y demográfico.
+
+---
+
+#### Tabla Cosenos Cuadrados en la dimensiones 3 y 4 
+
+
+```{r cos234, , echo=FALSE, warning=FALSE, results='asis'}
+# Crear un dataframe con todas las métricas
+var_coord <- as.data.frame(round(pcaRHINTce$var$coord, 4))
+var_contrib <- as.data.frame(round(pcaRHINTce$var$contrib, 2))
+var_cos2 <- as.data.frame(round(pcaRHINTce$var$cos2, 4))
+
+# Combinar solo las primeras 2 dimensiones
+var_results <- data.frame(
+  Variable = rownames(var_coord),
+  Coord_Dim3 = var_coord[,3],
+  Coord_Dim4 = var_coord[,4],
+  Contrib_Dim3 = var_contrib[,3],
+  Contrib_Dim4 = var_contrib[,4],
+  Cos2_Dim3 = var_cos2[,3],
+  Cos2_Dim4 = var_cos2[,4]
+)
+
+# Crear la tabla
+knitr::kable(var_results, "latex", booktabs = TRUE, 
+             caption = "Resultados del PCA: Coordenadas, Contribución y Calidad de Representación",
+             label = "pca_results") %>%
+  kableExtra::kable_styling(latex_options = c("striped", "scale_down", "hold_position"))
+
+```
+
+---
+
+##### Dimensiones 3-4
+
+- Dim3: Delitos sexuales (DCFS) (28.5%) y Violencia intrafamiliar (VI) (31%)
+
+- Dim4: Secuestros (S) (17.9%)
+
+- Hallazgo: Dimensiones críticas para evaluar seguridad ciudadana.
+
+---
+
+#### Tabla Cosenos Cuadrados en la dimensiones 5 y 6 
+
+```{r cos256, , echo=FALSE, warning=FALSE, results='asis'}
+# Crear un dataframe con todas las métricas
+var_coord <- as.data.frame(round(pcaRHINTce$var$coord, 4))
+var_contrib <- as.data.frame(round(pcaRHINTce$var$contrib, 2))
+var_cos2 <- as.data.frame(round(pcaRHINTce$var$cos2, 4))
+
+# Combinar solo las primeras 2 dimensiones
+var_results <- data.frame(
+  Variable = rownames(var_coord),
+  Coord_Dim5 = var_coord[,5],
+  Coord_Dim6 = var_coord[,6],
+  Contrib_Dim5 = var_contrib[,5],
+  Contrib_Dim6 = var_contrib[,6],
+  Cos2_Dim5 = var_cos2[,5],
+  Cos2_Dim6 = var_cos2[,6]
+)
+
+# Crear la tabla
+knitr::kable(var_results, "latex", booktabs = TRUE, 
+             caption = "Resultados del PCA: Coordenadas, Contribución y Calidad de Representación",
+             label = "pca_results") %>%
+  kableExtra::kable_styling(latex_options = c("striped", "scale_down", "hold_position"))
+
+```
+
+---
+
+##### Dimensiones 5-6
+
+- Dim5: Homicidios (H) (38% contribución, cos²=0.47)
+
+- Dim6: Mortalidad infantil (MI) (48.3% contribución, cos²=0.58)
+
+- Relevancia: Capturan patrones residuales en salud pública y violencia letal.
