@@ -58,6 +58,8 @@ colnames(RHINT)[2:20] <- c("PC", "TCP","AA","CBPS","CBES","RAP","CC",
 
 
 ## Punto 1
+Utilizar la función PCA del paquete FactoMiner para realizar un ACP con todas las variables que le correspondieron al grupo
+
 
 ### Estandarización de datos
 
@@ -178,17 +180,48 @@ kable(tabla_varianza,
 
 ### Tabla de correlaciones variables componentes
 
-```{r corr_table, echo=FALSE}
-# Tabla de correlaciones variables-componentes (solo para PDF/Beamer)
-kable(PCAtodas$var$cor,
-      caption = "Matriz de correlaciones entre variables y componentes principales",
-      col.names = paste0("Comp.", 1:ncol(PCAtodas$var$cor)),
-      digits = 2,
+\vspace{-1em}
+\scriptsize
+```{r corr_table, echo=FALSE, message=FALSE, warning=FALSE}
+library(kableExtra)
+library(formattable)
+
+# Redondear a dos decimales
+cor_data <- round(as.data.frame(PCAtodas$var$cor), 2)
+names(cor_data) <- paste0("C", 1:ncol(cor_data))  # Encabezados compactos
+
+# Función para formato condicional
+color_cor <- function(x) {
+  cell_spec(x, "latex",
+    bold = ifelse(abs(x) > 0.5, TRUE, FALSE),
+    color = case_when(
+      x > 0.5 ~ "green!50!black",
+      x < -0.5 ~ "red",
+      TRUE ~ "gray"
+    )
+  )
+}
+
+# Crear tabla con kable
+kable(cor_data %>% mutate(across(everything(), color_cor)),
+      caption = "Correlaciones variables-componentes",
       format = "latex",
-      booktabs = TRUE) %>%
-  kable_styling(latex_options = c("scale_down", "hold_position")) %>%
-  row_spec(0, bold = TRUE) %>%
-  footnote(general = "Valores representan coeficientes de correlación entre -1 y 1. Correlaciones > |0.5| se consideran significativas.")
+      booktabs = TRUE,
+      align = "c",
+      escape = FALSE) %>%
+  kable_styling(
+    latex_options = c("scale_down", "hold_position", "repeat_header"),
+    font_size = 6,
+    full_width = FALSE
+  ) %>%
+  column_spec(1, bold = TRUE) %>%
+  footnote(
+    general = "C1-C6: Componentes 1-6. |r| > 0.5 en negrita",
+    number = c("Verde: correlación positiva fuerte", "Rojo: correlación negativa fuerte"),
+    threeparttable = TRUE,
+    escape = FALSE
+  ) %>%
+  collapse_rows(columns = 1, latex_hline = "none")
 ```
 
 
