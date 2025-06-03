@@ -1,12 +1,5 @@
 ---
 title: "Lab ACP"
-author: 
-  - "Edwin Sanchez"
-  - "Stephanie Tamayo"
-  - "Andres Felipe Torres"
-  - "Fredy Urrea"
-  - "Sergio Velasquez"
-  - "Manuel Espitia"
 date: "2025-05-18"
 output: 
   beamer_presentation:
@@ -32,6 +25,19 @@ library(factoextra)
 library(kableExtra)
 ```
 
+
+## Integrantes
+
+### Grupo 6
+- Edwin Sanchez
+- Stephanie Tamayo
+- Andres Felipe Torres
+- Fredy Urrea
+- Sergio Velasquez
+- Manuel Espitia
+
+
+---
 
 ## Introduccion
 
