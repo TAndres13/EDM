@@ -449,7 +449,7 @@ fviz_pca_biplot(PCAtodas)
 ---
 
 \scriptsize
-```{r biplotcol}
+```{r biplotcol, echo=FALSE}
 fviz_pca_biplot(PCAtodas, 
                 axes = c(1, 3),  # Dim.1 (X) vs Dim.3 (Y)
                 col.var = "#FF7F00",  # Color naranja para variables
@@ -512,7 +512,7 @@ fviz_pca_biplot(PCAtodas,
 ---
 
 \scriptsize
-```{r setup 1}
+```{r setup 1, echo=FALSE}
 fviz_pca_biplot(PCAtodas, 
                 axes = c(2, 3),  # Dim.2 (X) vs Dim.3 (Y)
                 col.var = "#FF7F00",  # Color naranja para variables
@@ -812,8 +812,6 @@ kable(
 ---
 
 ### Variables y objetos graficados en distintas dimensiones
-
----
 
 #### Variables y ciudades en las Dimensiones 1 y 2
 
@@ -1247,6 +1245,7 @@ fviz_pca_biplot(pcaRHINTce,
 
 #### Tabla Cosenos Cuadrados en la dimensiones 1 y 2 
 
+\scriptsize
 ```{r cos212, , echo=FALSE, warning=FALSE, results='asis'}
 # Crear un dataframe con todas las métricas
 var_coord <- as.data.frame(round(pcaRHINTce$var$coord, 4))
@@ -1268,7 +1267,7 @@ var_results <- data.frame(
 knitr::kable(var_results, "latex", booktabs = TRUE, 
              caption = "Resultados del PCA: Coordenadas, Contribución y Calidad de Representación",
              label = "pca_results") %>%
-  kableExtra::kable_styling(latex_options = c("striped", "scale_down", "hold_position"))
+  kableExtra::kable_styling(latex_options = c("striped", "scale_down", "hold_position"), font_size = 6)
 
 ```
 
@@ -1287,28 +1286,32 @@ knitr::kable(var_results, "latex", booktabs = TRUE,
 #### Tabla Cosenos Cuadrados en la dimensiones 3 y 4 
 
 
-```{r cos234, , echo=FALSE, warning=FALSE, results='asis'}
-# Crear un dataframe con todas las métricas
-var_coord <- as.data.frame(round(pcaRHINTce$var$coord, 4))
+\scriptsize
+```{r cos234, echo=FALSE, warning=FALSE, results='asis'}
+# Crear un dataframe con todas las métricas redondeadas a 2 decimales
+var_coord <- as.data.frame(round(pcaRHINTce$var$coord, 2))
 var_contrib <- as.data.frame(round(pcaRHINTce$var$contrib, 2))
-var_cos2 <- as.data.frame(round(pcaRHINTce$var$cos2, 4))
+var_cos2 <- as.data.frame(round(pcaRHINTce$var$cos2, 2))
 
-# Combinar solo las primeras 2 dimensiones
+# Combinar solo las dimensiones 3 y 4
 var_results <- data.frame(
   Variable = rownames(var_coord),
-  Coord_Dim3 = var_coord[,3],
-  Coord_Dim4 = var_coord[,4],
-  Contrib_Dim3 = var_contrib[,3],
-  Contrib_Dim4 = var_contrib[,4],
-  Cos2_Dim3 = var_cos2[,3],
-  Cos2_Dim4 = var_cos2[,4]
+  Coord_Dim3 = var_coord[, 3],
+  Coord_Dim4 = var_coord[, 4],
+  Contrib_Dim3 = var_contrib[, 3],
+  Contrib_Dim4 = var_contrib[, 4],
+  Cos2_Dim3 = var_cos2[, 3],
+  Cos2_Dim4 = var_cos2[, 4]
 )
 
-# Crear la tabla
-knitr::kable(var_results, "latex", booktabs = TRUE, 
+# Mostrar tabla en formato compacto
+knitr::kable(var_results, format = "latex", booktabs = TRUE,
              caption = "Resultados del PCA: Coordenadas, Contribución y Calidad de Representación",
              label = "pca_results") %>%
-  kableExtra::kable_styling(latex_options = c("striped", "scale_down", "hold_position"))
+  kableExtra::kable_styling(
+    latex_options = c("striped", "scale_down", "hold_position"),
+    font_size = 6
+  )
 
 ```
 
@@ -1360,3 +1363,5 @@ knitr::kable(var_results, "latex", booktabs = TRUE,
 - Dim6: Mortalidad infantil (MI) (48.3% contribución, cos²=0.58)
 
 - Relevancia: Capturan patrones residuales en salud pública y violencia letal.
+
+## Punto 4
