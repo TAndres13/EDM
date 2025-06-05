@@ -2,6 +2,15 @@
 title: "Lab ACP"
 date: "2025-05-18"
 output: 
+  html_document:
+    theme: cerulean
+    highlight: "pygments"
+    fig_width: 6.5
+    fig_height: 4
+    toc: true
+    toc_float: true
+    code_folding: "hide"
+    df_print: "kable"    
   beamer_presentation:
     theme: "Madrid"
     colortheme: "spruce"
@@ -130,15 +139,16 @@ tabla_varianza <- PCAtodas$eig[1:7, ]
 # Personaliza este título/índice
 indice_tabla <- "Tabla 1. Varianza explicada por los componentes principales"
 
-kable(tabla_varianza,
+knitr::kable(tabla_varianza,
       caption = indice_tabla,
       digits = 2,
       col.names = c("Autovalor", "Varianza (%)", "Varianza Acumulada (%)"),
-      format = "latex",
+      format = ifelse(knitr::is_html_output(), "html", "latex"),
       booktabs = TRUE) %>%
   kable_styling(
-    latex_options = c("scale_down", "hold_position", "striped"),
-    font_size = 8,
+    bootstrap_options = c("striped", "condensed", "hover"),
+    font_size = 14,
+    full_width = FALSE,
     position = "center"
   ) %>%
   row_spec(0, bold = TRUE) %>%
@@ -148,7 +158,8 @@ kable(tabla_varianza,
                     round(sum(tabla_varianza[,2]), 1), 
                     "% de la varianza total"),
     number = c("Criterio de selección: Autovalor > 1 (Kaiser)",
-               paste("Fecha de análisis:", format(Sys.Date(), "%d/%m/%Y")))
+               paste("Fecha de análisis:", format(Sys.Date(), "%d/%m/%Y"))),
+    escape = FALSE
   )
 
 ```
@@ -1387,10 +1398,10 @@ varianza1 <- as.data.frame(PCAtodas$eig[1:7, ]) %>%
   mutate(ACP = "ACP 1", Componente = paste("Comp", 1:7))
 
 varianza2 <- as.data.frame(res.pca$eig) %>% 
-  mutate(ACP = "ACP 2", Componente = paste("Comp", 1:nrow(.)))
+  mutate(ACP = "ACP 2", Componente = paste("Comp", 1:5))
 
 varianza3 <- as.data.frame(pcaRHINTce$eig) %>% 
-  mutate(ACP = "ACP 3", Componente = paste("Comp", 1:nrow(.)))
+  mutate(ACP = "ACP 3", Componente = paste("Comp", 1:14))
 
 # Combinar todos los datos
 comparativa_varianza <- bind_rows(varianza1, varianza2, varianza3) %>% 
@@ -1414,5 +1425,108 @@ kable(comparativa_varianza,
            number = paste("Fecha:", Sys.Date()),
            threeparttable = TRUE)
 ```
+
+
+---
+
+### Varianza explicada:
+
+- ACP 2 explica el 85.4% con solo 2 dimensiones → más eficiente.
+
+- ACP 1 y 3 explican ~41% en dos dimensiones → necesitan más componentes.
+
+- Conclusión: ACP 2 es el más eficiente en reducción dimensional.
+
+---
+
+
+#### Ejes principales:
+
+- ACP 1: mezcla de economía, población y educación.
+
+- ACP 2: apertura internacional + cobertura educativa.
+
+- ACP 3: desigualdad social y violencia.
+
+- Conclusión: Cada ACP revela dimensiones distintas.
+
+---
+
+```{r grafico_var_dim123, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.width=10, fig.height=6, fig.cap="Gráfico de variables (Dim.1 vs Dim.2) - Análisis PCA"}
+# Gráfico de variables para Dim.1 vs Dim.2 (optimizado)
+fviz_pca_var(PCAtodas, 
+             axes = c(1, 2),                # Dimensiones 1 y 2 (ejes principales)
+             col.var = "contrib",           # Color por contribución a las dimensiones
+             gradient.cols = c("#2E9FDF", "#E7B800", "#D55E00"),  # Gradiente azul-amarillo-rojo
+             repel = TRUE,                  # Textos inteligentes sin solapamiento
+             alpha.var = "contrib",         # Transparencia según contribución
+             title = "Mapa de Variables - PCA (Dimensión 1 vs Dimensión 2)") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+    legend.position = "right",
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12)
+  ) 
+```
+
+---
+
+```{r FFF, echo=FALSE}
+fviz_pca_var(res.pca, col.var = "cos2", 
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE, title = "Variables activas e ilustrativas")
+```
+
+---
+
+```{r GGGG,echo=FALSE}
+bipl1 <- fviz_pca_var(
+  pcaRHINTce,
+  label = "var",
+  col.var = "cos2",
+  gradient.cols = c("blue", "orange", "red"),
+  repel = TRUE,
+  title = "A) Variables",
+  labelsize = 3
+)
+
+
+```
+
+---
+
+#### Posición de las ciudades:
+
+- ACP 2: grupos claros → ej. Manizales y Cartago bien posicionadas.
+
+- ACP 3: segmentación social → ej. Bucaramanga con violencia.
+
+-  Conclusión: La representación cambia según variables activas.
+
+---
+
+#### Calidad de representación (cos²):
+
+- ACP 2 tiene mejores cos² → mejor visualización.
+
+- ACP 3: algunas variables sociales bien representadas.
+
+- Conclusión: ACP 2 es el más claro gráficamente.
+
+
+---
+
+#### Interpretación final:
+
+- ACP 1: general, exploratorio.
+
+- ACP 2: enfocado en desarrollo económico y educativo.
+
+- ACP 3: visibiliza brechas sociales.
+
+- Conclusión: Los tres ACP se complementan.
+
+
 
 

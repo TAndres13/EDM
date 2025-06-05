@@ -1123,3 +1123,69 @@ Por su parte, en las dimensiones 5 y 6 (tabla 5), se destaca Mortalidad Infantil
 
 Finalmente, variables como la Tasa de Ocupación (TOE), Calidad de los colegios (CC) y Capacitación para el trabajo (CPT) mantienen niveles bajos de contribución en las dimensiones más alejadas (Dim3–Dim6), reafirmando su influencia más marcada en las primeras componentes principales. Las variables suplementarias, aunque no contribuyen directamente a la construcción del espacio factorial, ayudan a enriquecer la interpretación, situando a las ciudades también desde una perspectiva de internacionalización y diversificación económica.
 
+
+
+## Punto 4
+
+
+Punto 4. Comparación de los tres análisis de componentes principales (ACP)
+
+En este apartado se realiza una comparación entre los tres análisis de componentes principales desarrollados previamente. Cada uno de ellos responde a una estructura distinta de variables activas e ilustrativas, lo que permite contrastar las dimensiones extraídas, la capacidad de representación y la interpretación socioterritorial de las ciudades.
+
+Varianza explicada
+
+La primera gran diferencia se observa en la proporción de varianza explicada por los componentes principales.
+
+En el ACP 1 (todas las variables del grupo: Recursos Humanos y de Internacionalización), las dos primeras dimensiones acumularon 42.36% de la varianza (Dim.1 = 23%, Dim.2 = 19.4%). Para alcanzar una cobertura del 80%, se necesitaron al menos seis componentes.
+
+El ACP 2, que consideró solo las variables de internacionalización como activas y las RH como ilustrativas, logró una explicación del 85.4% con solo dos componentes (Dim.1 = 62.2%, Dim.2 = 23.2%). Esta notable eficiencia en reducción dimensional indica una estructura más concentrada de la información en ese subconjunto de variables.
+
+En el ACP 3, donde las variables RH fueron activas y las INT ilustrativas, las dos primeras dimensiones explicaron 41.5% de la varianza (Dim.1 = 25.5%, Dim.2 = 16%), resultado muy similar al del ACP 1.
+
+Conclusión: El ACP 2 es el más eficiente para simplificar la información multivariada, mientras que ACP 1 y 3 requieren más componentes para alcanzar umbrales aceptables de explicación (>70%).
+
+Variables con mayor carga factorial
+
+Cada análisis extrae componentes distintos según el tipo de variables activas:
+
+En el ACP 1, las dimensiones principales reflejaron factores estructurales mixtos. La Dim.1 combinó variables de población, dinamismo económico y balanza comercial (PC, TOE, DM), mientras que la Dim.2 capturó apertura internacional y cobertura educativa (CBES, CI).
+
+En el ACP 2, los componentes fueron más nítidos: la Dim.1 sintetizó los procesos de integración global (CI, DP, TOE), y la Dim.2 reflejó contrastes en cobertura en salud, calidad educativa (CC), y aspectos demográficos.
+
+En el ACP 3, las variables sociales se posicionaron como protagonistas. La Dim.1 estuvo dominada por indicadores como analfabetismo (AA), crecimiento poblacional (TCP) y mortalidad infantil (MI), mientras que la Dim.2 expresó contrastes entre educación superior (CBES) y fenómenos de violencia (secuestros, delitos sexuales).
+
+Conclusión: La selección de variables activas cambia completamente la naturaleza del espacio factorial. Mientras ACP 2 está centrado en procesos económicos y educativos con alta estructuración, ACP 3 expone de forma más clara las brechas sociales y de seguridad.
+
+Coordenadas de las ciudades
+
+Las posiciones factoriales de las ciudades también se modifican entre análisis.
+
+En el ACP 1, ciudades como Bogotá, Medellín y Cali emergen como polos de desarrollo, mientras que otras como Riohacha o Sincelejo reflejan rezagos multivariados.
+
+En el ACP 2, los agrupamientos están mejor definidos: ciudades como Cartago y Manizales muestran un alto grado de internacionalización y cobertura educativa, mientras que otras como San Andrés o Cúcuta aparecen rezagadas.
+
+En el ACP 3, se evidencia una fuerte segmentación según problemas sociales. Por ejemplo, Bucaramanga y Villavicencio aparecen asociados a violencia intrafamiliar o delitos sexuales, mientras que ciudades como Pasto o Montería muestran mejor cobertura educativa y seguridad.
+
+Conclusión: La representación de las ciudades depende del tipo de variable activa. ACP 2 permite observar dinámicas económico-educativas, mientras que ACP 3 hace más visibles las desigualdades en salud, violencia y formación laboral.
+
+Calidad de representación (cos²)
+
+Los cosenos cuadrados permiten evaluar qué tan bien se representan las variables en el plano formado por las dos primeras dimensiones:
+
+En el ACP 2, los cos² fueron altos para la mayoría de variables activas, lo que implica una excelente representación gráfica.
+
+En el ACP 1, se observaron cos² medios y bajos en varias variables, lo cual sugiere que se requieren más dimensiones para captar bien la estructura de los datos.
+
+En el ACP 3, algunas variables sociales tuvieron buenos cos² (ej. AA, VI, DCFS), pero otras como H o CS solo se representaron adecuadamente en dimensiones superiores.
+
+Conclusión: ACP 2 es el más eficiente gráficamente para explicar la estructura del fenómeno; ACP 3 captura bien problemas sociales, pero requiere más dimensiones.
+
+Interpretación integral
+
+El ACP 1 ofrece una visión amplia pero difusa, donde se entremezclan dimensiones educativas, económicas y sociales. Su utilidad es exploratoria, pero puede carecer de foco analítico.
+El ACP 2 proporciona un análisis más claro y jerarquizado, útil para identificar clústeres de desarrollo basados en apertura comercial y cobertura educativa. Las variables RH como ilustrativas permiten contextualizar sin desordenar el espacio factorial.
+El ACP 3 permite visibilizar desigualdades sociales más profundas. Es ideal si el interés del análisis son las problemáticas de educación, violencia o salud pública.
+
+Conclusión final: Los tres ACP son complementarios. Mientras ACP 2 permite tomar decisiones sobre internacionalización y competitividad, el ACP 3 puede apoyar el diseño de políticas sociales. El ACP 1 es útil como resumen general, aunque menos preciso que los otros dos.
+
+
