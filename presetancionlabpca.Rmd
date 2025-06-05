@@ -92,19 +92,12 @@ datos.
 
 ---
 
-\vspace{5em}
-```{r pressure2, echo=FALSE}
-PCAtodas<-PCA(RHINT[,2:20],scale.unit = T, ncp=7)
+\vspace{0em}
+```{r pressure2, warning=FALSE}
+PCAtodas<-PCA(RHINT[,2:20],scale.unit = T, ncp=7, graph = F)
 
 ```
 
----
-
-\vspace{-22em}
-```{r pressure23, echo=FALSE}
-PCAtodas<-PCA(RHINT[,2:20],scale.unit = T, ncp=7)
-
-```
 
 ---
 
@@ -130,35 +123,40 @@ Total acumulado (3 primeros): 54.8%
 
 ---
 
-### Tabla de varianza explicada con índice personalizado
+### Tabla de varianza explicada
 
-```{r varianza_table, echo=FALSE}
-# Tabla de varianza explicada con índice personalizado
-tabla_varianza <- PCAtodas$eig[1:7, ]
+```{r varianza_table, echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+library(kableExtra)
 
-# Personaliza este título/índice
-indice_tabla <- "Tabla 1. Varianza explicada por los componentes principales"
+# Extrae los primeros 7 componentes principales y redondea a 2 decimales
+tabla_varianza <- round(PCAtodas$eig[1:7, ], 2)
 
-knitr::kable(tabla_varianza,
+# Personaliza el título
+indice_tabla <- "Tabla 1. Porcentaje de varianza explicada por los componentes principales"
+
+# Genera tabla con mejoras visuales y formato HTML o LaTeX
+kable(tabla_varianza,
       caption = indice_tabla,
-      digits = 2,
       col.names = c("Autovalor", "Varianza (%)", "Varianza Acumulada (%)"),
       format = ifelse(knitr::is_html_output(), "html", "latex"),
-      booktabs = TRUE) %>%
+      booktabs = TRUE,
+      align = "c") %>%
   kable_styling(
-    bootstrap_options = c("striped", "condensed", "hover"),
+    bootstrap_options = c("striped", "condensed", "hover", "responsive"),
     font_size = 14,
     full_width = FALSE,
     position = "center"
   ) %>%
-  row_spec(0, bold = TRUE) %>%
+  row_spec(0, bold = TRUE, background = "#f2f2f2") %>%
+  column_spec(1:3, width = "4cm") %>%
   footnote(
-    general = paste("Nota: Se muestran los primeros", nrow(tabla_varianza), 
-                    "componentes que explican el", 
-                    round(sum(tabla_varianza[,2]), 1), 
-                    "% de la varianza total"),
-    number = c("Criterio de selección: Autovalor > 1 (Kaiser)",
-               paste("Fecha de análisis:", format(Sys.Date(), "%d/%m/%Y"))),
+    general = paste("Nota: Se presentan los primeros", nrow(tabla_varianza), 
+                    "componentes principales, los cuales explican en conjunto el",
+                    round(sum(tabla_varianza[,3]), 1), 
+                    "% de la varianza total."),
+    number = c("1. Criterio de selección: Autovalor > 1 (Regla de Kaiser)",
+               paste0("2. Fecha de análisis: ", format(Sys.Date(), "%d/%m/%Y"))),
     escape = FALSE
   )
 
@@ -199,46 +197,45 @@ knitr::kable(tabla_varianza,
 
 \vspace{-1em}
 \scriptsize
-```{r corr_table, echo=FALSE, message=FALSE, warning=FALSE}
+```{r corr_table_html, echo=FALSE, message=FALSE, warning=FALSE}
 library(kableExtra)
-library(formattable)
+library(dplyr)
 
 # Redondear a dos decimales
 cor_data <- round(as.data.frame(PCAtodas$var$cor), 2)
-names(cor_data) <- paste0("C", 1:ncol(cor_data))  # Encabezados compactos
+names(cor_data) <- paste0("C", 1:ncol(cor_data))  # Encabezados C1, C2, ...
 
-# Función para formato condicional
+# Función para aplicar formato condicional en HTML
 color_cor <- function(x) {
-  cell_spec(x, "latex",
-    bold = ifelse(abs(x) > 0.5, TRUE, FALSE),
+  cell_spec(x, "html",
+    bold = abs(x) > 0.5,
     color = case_when(
-      x > 0.5 ~ "green!50!black",
+      x > 0.5 ~ "darkgreen",
       x < -0.5 ~ "red",
       TRUE ~ "gray"
     )
   )
 }
 
-# Crear tabla con kable
+# Crear tabla con estilo HTML
 kable(cor_data %>% mutate(across(everything(), color_cor)),
-      caption = "Correlaciones variables-componentes",
-      format = "latex",
-      booktabs = TRUE,
-      align = "c",
-      escape = FALSE) %>%
+      caption = "Tabla 2. Correlaciones entre variables y componentes principales",
+      format = "html",
+      escape = FALSE,
+      align = "c") %>%
   kable_styling(
-    latex_options = c("scale_down", "hold_position", "repeat_header"),
-    font_size = 6,
-    full_width = FALSE
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = FALSE,
+    font_size = 13,
+    position = "center"
   ) %>%
   column_spec(1, bold = TRUE) %>%
   footnote(
-    general = "C1-C6: Componentes 1-6. |r| > 0.5 en negrita",
+    general = "C1–C6: Componentes principales. Las correlaciones con |r| > 0.5 están en negrita.",
     number = c("Verde: correlación positiva fuerte", "Rojo: correlación negativa fuerte"),
-    threeparttable = TRUE,
     escape = FALSE
-  ) %>%
-  collapse_rows(columns = 1, latex_hline = "none")
+  )
+
 ```
 
 
@@ -610,11 +607,32 @@ res.pca <- PCA(base_acp, scale.unit = TRUE, quanti.sup = 6:19, graph = FALSE)
 #### a) Valores propios
 \vspace{0em}
 \scriptsize
-```{r}
+```{r eig_table_html, echo=FALSE, message=FALSE, warning=FALSE}
+library(kableExtra)
+library(dplyr)
+
+# Redondear valores propios a 3 decimales
 eig.val <- round(res.pca$eig, 3)
-kable(eig.val, format = "latex", booktabs = TRUE,
-      caption = "Valores propios y varianza explicada") %>%
-  kable_styling(latex_options = c("striped", "hold_position"))
+
+# Crear tabla en HTML con estilo
+kable(eig.val,
+      format = "html",
+      caption = "Tabla 3. Valores propios y porcentaje de varianza explicada",
+      col.names = c("Autovalor", "Varianza (%)", "Varianza Acumulada (%)"),
+      align = "c",
+      escape = FALSE) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    font_size = 13,
+    full_width = FALSE,
+    position = "center"
+  ) %>%
+  row_spec(0, bold = TRUE, background = "#f2f2f2") %>%
+  footnote(
+    general = paste("Nota: La tabla muestra la importancia relativa de cada componente principal."),
+    escape = FALSE
+  )
+
 ```
 
 ---
@@ -654,11 +672,30 @@ kable(eig.val, format = "latex", booktabs = TRUE,
 #### b) Correlaciones de variables activas
 \vspace{0em}
 \scriptsize
-```{r}
-kable(round(res.pca$var$cor, 3), format = "latex", 
-      booktabs = TRUE,
-      caption = "Correlación de variables activas con los factores") %>%
-  kable_styling(latex_options = c("striped", "hold_position"))
+```{r cor_activa_html, echo=FALSE, message=FALSE, warning=FALSE}
+library(kableExtra)
+library(dplyr)
+
+# Redondear correlaciones a 3 decimales
+cor_vars <- round(res.pca$var$cor, 3)
+
+# Crear tabla HTML con estilo
+kable(cor_vars,
+      format = "html",
+      caption = "Tabla 4. Correlación de variables activas con los factores",
+      align = "c",
+      escape = FALSE) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = FALSE,
+    font_size = 13,
+    position = "center"
+  ) %>%
+  row_spec(0, bold = TRUE, background = "#f2f2f2") %>%
+  footnote(
+    general = "Nota: Se presentan las correlaciones de las variables originales con los componentes principales.",
+    escape = FALSE
+  )
 ```
 
 ---
@@ -684,11 +721,31 @@ Las ciudades con mayor apertura global muestran:
 #### c) Correlaciones de variables ilustrativas
 \vspace{-1em}
 \scriptsize
-```{r}
-kable(round(res.pca$quanti.sup$cor, 3), format = "latex", 
-      booktabs = TRUE,
-      caption = "Correlación de variables ilustrativas con los factores") %>%
-  kable_styling(latex_options = c("striped", "hold_position"))
+```{r cor_illustrativas_html, echo=FALSE, message=FALSE, warning=FALSE}
+library(kableExtra)
+library(dplyr)
+
+# Redondear la matriz de correlaciones
+cor_illustrativas <- round(res.pca$quanti.sup$cor, 3)
+
+# Crear tabla en HTML con estilo
+kable(cor_illustrativas,
+      format = "html",
+      caption = "Tabla 5. Correlación de variables ilustrativas con los factores",
+      align = "c",
+      escape = FALSE) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = FALSE,
+    font_size = 13,
+    position = "center"
+  ) %>%
+  row_spec(0, bold = TRUE, background = "#f2f2f2") %>%
+  footnote(
+    general = "Nota: Se presentan las correlaciones entre variables ilustrativas (cuantitativas suplementarias) y los componentes principales.",
+    escape = FALSE
+  )
+
 ```
 
 ---
@@ -777,18 +834,28 @@ pcaRHINTce <- PCA(RHINTce, quanti.sup = c(15:19), graph = F, ncp = 6)
 ### Valores propios y varianza explicada
 \vspace{-0.5em}
 \tiny 
-```{r valvar, echo=FALSE, warning=FALSE, results='asis'}
-# Tabla de valores propios y varianzas
+```{r valvar_html, echo=FALSE, warning=FALSE, results='asis'}
+library(kableExtra)
+library(dplyr)
+
+# Redondear los valores propios y varianzas
 vp <- round(pcaRHINTce$eig, 4)
 
-# Crear tabla con kableExtra
-require(kableExtra)
-kable(vp, format = "latex", booktabs = TRUE,
-      caption = "Valores propios, porcentaje de varianza y varianza acumulada", 
-      label = "vprankis",
-      col.names = c("Valor propio", "% Varianza", "% Acumulado")) %>%
-  kable_styling(latex_options = c("scale_down", "hold_position"), font_size = 6, full_width = FALSE) %>%
-  row_spec(0, bold = TRUE)  # Encabezados en negrita
+# Crear tabla en HTML
+kable(vp,
+      format = "html",
+      caption = "Tabla 6. Valores propios, porcentaje de varianza y varianza acumulada",
+      col.names = c("Valor propio", "% Varianza", "% Acumulado"),
+      align = "c",
+      escape = FALSE) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    font_size = 12,
+    full_width = FALSE,
+    position = "center"
+  ) %>%
+  row_spec(0, bold = TRUE, background = "#f2f2f2")
+
 ```
 
 
@@ -806,17 +873,29 @@ kable(vp, format = "latex", booktabs = TRUE,
 ### Correlaciones variable factor
 \vspace{-0.5em}
 \tiny
-```{r correlaciones variable factor, echo=FALSE, warning=FALSE, results='asis', fig.width=2, fig.height=2, fig.pos='H', out.width='70%'}
-#tabla latex correlaciones variable factor
+```{r correlaciones_variable_factor_html, echo=FALSE, warning=FALSE, results='asis'}
+library(kableExtra)
+library(dplyr)
 
+# Redondear correlaciones a 4 decimales y seleccionar primeras 6 dimensiones
+cor_var_fac <- round(pcaRHINTce$var$cor[, 1:6], 4)
+
+# Crear tabla HTML con estilo
 kable(
-  round(pcaRHINTce$var$cor[, 1:6], 4),  # Selección de 6 dimensiones
-  "latex",
-  booktabs = TRUE,
-  caption = "Correlaciones variables factor primeras 6 dimensiones",
-  label = "corvarfact"
+  cor_var_fac,
+  format = "html",
+  caption = "Tabla 7. Correlaciones entre variables y las primeras 6 dimensiones",
+  align = "c",
+  escape = FALSE
 ) %>%
-  kable_styling(latex_options = c("striped", "hold_position"))
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    font_size = 12,
+    full_width = FALSE,
+    position = "center"
+  ) %>%
+  row_spec(0, bold = TRUE, background = "#f2f2f2")
+
 ```
 
 ##### Análisis de Correlaciones Principales (6 primeras dimensiones):
@@ -1263,13 +1342,16 @@ fviz_pca_biplot(pcaRHINTce,
 #### Tabla Cosenos Cuadrados en la dimensiones 1 y 2 
 
 \scriptsize
-```{r cos212, , echo=FALSE, warning=FALSE, results='asis'}
-# Crear un dataframe con todas las métricas
+```{r cos212_html, echo=FALSE, warning=FALSE, results='asis'}
+library(kableExtra)
+library(dplyr)
+
+# Redondear y preparar los datos
 var_coord <- as.data.frame(round(pcaRHINTce$var$coord, 4))
 var_contrib <- as.data.frame(round(pcaRHINTce$var$contrib, 2))
 var_cos2 <- as.data.frame(round(pcaRHINTce$var$cos2, 4))
 
-# Combinar solo las primeras 2 dimensiones
+# Combinar las métricas para las dos primeras dimensiones
 var_results <- data.frame(
   Variable = rownames(var_coord),
   Coord_Dim1 = var_coord[,1],
@@ -1280,11 +1362,20 @@ var_results <- data.frame(
   Cos2_Dim2 = var_cos2[,2]
 )
 
-# Crear la tabla
-knitr::kable(var_results, "latex", booktabs = TRUE, 
-             caption = "Resultados del PCA: Coordenadas, Contribución y Calidad de Representación",
-             label = "pca_results") %>%
-  kableExtra::kable_styling(latex_options = c("striped", "scale_down", "hold_position"), font_size = 6)
+# Crear tabla HTML estilizada
+kable(var_results,
+      format = "html",
+      caption = "Tabla 8. Resultados del PCA: Coordenadas, Contribución y Calidad de Representación (Cos2)",
+      align = "c",
+      escape = FALSE) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    font_size = 12,
+    full_width = FALSE,
+    position = "center"
+  ) %>%
+  row_spec(0, bold = TRUE, background = "#f2f2f2")
+
 
 ```
 
@@ -1304,13 +1395,16 @@ knitr::kable(var_results, "latex", booktabs = TRUE,
 
 
 \scriptsize
-```{r cos234, echo=FALSE, warning=FALSE, results='asis'}
-# Crear un dataframe con todas las métricas redondeadas a 2 decimales
+```{r cos234_html, echo=FALSE, warning=FALSE, results='asis'}
+library(kableExtra)
+library(dplyr)
+
+# Redondear y preparar los datos
 var_coord <- as.data.frame(round(pcaRHINTce$var$coord, 2))
 var_contrib <- as.data.frame(round(pcaRHINTce$var$contrib, 2))
 var_cos2 <- as.data.frame(round(pcaRHINTce$var$cos2, 2))
 
-# Combinar solo las dimensiones 3 y 4
+# Seleccionar dimensiones 3 y 4
 var_results <- data.frame(
   Variable = rownames(var_coord),
   Coord_Dim3 = var_coord[, 3],
@@ -1321,14 +1415,19 @@ var_results <- data.frame(
   Cos2_Dim4 = var_cos2[, 4]
 )
 
-# Mostrar tabla en formato compacto
-knitr::kable(var_results, format = "latex", booktabs = TRUE,
-             caption = "Resultados del PCA: Coordenadas, Contribución y Calidad de Representación",
-             label = "pca_results") %>%
-  kableExtra::kable_styling(
-    latex_options = c("striped", "scale_down", "hold_position"),
-    font_size = 6
-  )
+# Generar tabla HTML
+kable(var_results,
+      format = "html",
+      caption = "Tabla 9. Resultados del PCA: Coordenadas, Contribución y Calidad de Representación (Dimensiones 3 y 4)",
+      align = "c",
+      escape = FALSE) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    font_size = 12,
+    full_width = FALSE,
+    position = "center"
+  ) %>%
+  row_spec(0, bold = TRUE, background = "#f2f2f2")
 
 ```
 
@@ -1346,28 +1445,39 @@ knitr::kable(var_results, format = "latex", booktabs = TRUE,
 
 #### Tabla Cosenos Cuadrados en la dimensiones 5 y 6 
 
-```{r cos256, , echo=FALSE, warning=FALSE, results='asis'}
-# Crear un dataframe con todas las métricas
+```{r cos256_html, echo=FALSE, warning=FALSE, results='asis'}
+library(kableExtra)
+library(dplyr)
+
+# Redondear datos
 var_coord <- as.data.frame(round(pcaRHINTce$var$coord, 4))
 var_contrib <- as.data.frame(round(pcaRHINTce$var$contrib, 2))
 var_cos2 <- as.data.frame(round(pcaRHINTce$var$cos2, 4))
 
-# Combinar solo las primeras 2 dimensiones
+# Seleccionar dimensiones 5 y 6
 var_results <- data.frame(
   Variable = rownames(var_coord),
-  Coord_Dim5 = var_coord[,5],
-  Coord_Dim6 = var_coord[,6],
-  Contrib_Dim5 = var_contrib[,5],
-  Contrib_Dim6 = var_contrib[,6],
-  Cos2_Dim5 = var_cos2[,5],
-  Cos2_Dim6 = var_cos2[,6]
+  Coord_Dim5 = var_coord[, 5],
+  Coord_Dim6 = var_coord[, 6],
+  Contrib_Dim5 = var_contrib[, 5],
+  Contrib_Dim6 = var_contrib[, 6],
+  Cos2_Dim5 = var_cos2[, 5],
+  Cos2_Dim6 = var_cos2[, 6]
 )
 
-# Crear la tabla
-knitr::kable(var_results, "latex", booktabs = TRUE, 
-             caption = "Resultados del PCA: Coordenadas, Contribución y Calidad de Representación",
-             label = "pca_results") %>%
-  kableExtra::kable_styling(latex_options = c("striped", "scale_down", "hold_position"))
+# Generar tabla HTML
+kable(var_results,
+      format = "html",
+      caption = "Tabla 10. Resultados del PCA: Coordenadas, Contribución y Calidad de Representación (Dimensiones 5 y 6)",
+      align = "c",
+      escape = FALSE) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    font_size = 12,
+    full_width = FALSE,
+    position = "center"
+  ) %>%
+  row_spec(0, bold = TRUE, background = "#f2f2f2")
 
 ```
 
@@ -1388,12 +1498,11 @@ knitr::kable(var_results, "latex", booktabs = TRUE,
 ### Comparacion de los 3 ACP
 
 \vspace{-0.5em}
-```{r comprativa, echo=FALSE, warning=FALSE}
+```{r comparativa_html, echo=FALSE, warning=FALSE}
 library(kableExtra)
 library(dplyr)
 
-# Asumiendo que tienes tres objetos ACP: PCAtodas, res.pca y pcaRHINTce
-# Extraer datos de varianza explicada de cada ACP
+# Extraer y preparar datos
 varianza1 <- as.data.frame(PCAtodas$eig[1:7, ]) %>% 
   mutate(ACP = "ACP 1", Componente = paste("Comp", 1:7))
 
@@ -1408,22 +1517,30 @@ comparativa_varianza <- bind_rows(varianza1, varianza2, varianza3) %>%
   select(ACP, Componente, 
          `Valor propio` = eigenvalue, 
          `% Varianza` = `percentage of variance`,
-         `% Acumulado` = `cumulative percentage of variance`)
+         `% Acumulado` = `cumulative percentage of variance`) %>%
+  mutate(across(where(is.numeric), round, 2))  # Redondear columnas numéricas
 
-# Crear tabla comparativa
-kable(comparativa_varianza, 
-      format = "latex",
-      booktabs = TRUE,
-      caption = "Comparativa de varianza explicada entre los tres ACP",
-      digits = 2) %>%
-  kable_styling(latex_options = c("hold_position", "striped"),
-                font_size = 5) %>%
-  pack_rows("ACP 1", 1, 7) %>%
-  pack_rows("ACP 2", 8, 8+nrow(varianza2)-1) %>%
-  pack_rows("ACP 3", 8+nrow(varianza2), 8+nrow(varianza2)+nrow(varianza3)-1) %>%
-  footnote(general = "Comparación de la varianza explicada por componentes principales en tres análisis diferentes",
-           number = paste("Fecha:", Sys.Date()),
-           threeparttable = TRUE)
+# Crear tabla HTML
+kable(comparativa_varianza,
+      format = "html",
+      caption = "Tabla 11. Comparativa de varianza explicada entre los tres ACP",
+      align = "c",
+      escape = FALSE) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    font_size = 11,
+    full_width = FALSE,
+    position = "center"
+  ) %>%
+  group_rows("ACP 1", 1, 7) %>%
+  group_rows("ACP 2", 8, 8 + nrow(varianza2) - 1) %>%
+  group_rows("ACP 3", 8 + nrow(varianza2), 7 + nrow(varianza2) + nrow(varianza3)) %>%
+  footnote(
+    general = "Comparación de la varianza explicada por componentes principales en tres análisis diferentes.",
+    number = paste("Fecha:", format(Sys.Date(), "%d/%m/%Y")),
+    escape = FALSE
+  )
+
 ```
 
 
