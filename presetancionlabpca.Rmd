@@ -143,13 +143,16 @@ kable(tabla_varianza,
       booktabs = TRUE,
       align = "c") %>%
   kable_styling(
-    bootstrap_options = c("striped", "condensed", "hover", "responsive"),
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
     font_size = 14,
     full_width = FALSE,
     position = "center"
   ) %>%
   row_spec(0, bold = TRUE, background = "#f2f2f2") %>%
-  column_spec(1:3, width = "4cm") %>%
+  row_spec(1:nrow(tabla_varianza), background = ifelse(seq_len(nrow(tabla_varianza)) %% 2 == 0, "#e6f7ff", "#ffffff")) %>%
+  column_spec(1, bold = TRUE, border_right = TRUE, width = "4cm") %>%
+  column_spec(2, color = "blue") %>%
+  column_spec(3, color = "darkgreen") %>%
   footnote(
     general = paste("Nota: Se presentan los primeros", nrow(tabla_varianza), 
                     "componentes principales, los cuales explican en conjunto el",
@@ -607,14 +610,14 @@ res.pca <- PCA(base_acp, scale.unit = TRUE, quanti.sup = 6:19, graph = FALSE)
 #### a) Valores propios
 \vspace{0em}
 \scriptsize
-```{r eig_table_html, echo=FALSE, message=FALSE, warning=FALSE}
+```{r enhanced_table_html, echo=FALSE, message=FALSE, warning=FALSE}
 library(kableExtra)
 library(dplyr)
 
 # Redondear valores propios a 3 decimales
 eig.val <- round(res.pca$eig, 3)
 
-# Crear tabla en HTML con estilo
+# Crear tabla en HTML con estilo mejorado
 kable(eig.val,
       format = "html",
       caption = "Tabla 3. Valores propios y porcentaje de varianza explicada",
@@ -628,6 +631,10 @@ kable(eig.val,
     position = "center"
   ) %>%
   row_spec(0, bold = TRUE, background = "#f2f2f2") %>%
+  row_spec(1:nrow(eig.val), background = ifelse(seq_len(nrow(eig.val)) %% 2 == 0, "#e6f7ff", "#ffffff")) %>%
+  column_spec(1, bold = TRUE, border_right = TRUE) %>%
+  column_spec(2, color = "blue") %>%
+  column_spec(3, color = "darkgreen") %>%
   footnote(
     general = paste("Nota: La tabla muestra la importancia relativa de cada componente principal."),
     escape = FALSE
@@ -679,8 +686,12 @@ library(dplyr)
 # Redondear correlaciones a 3 decimales
 cor_vars <- round(res.pca$var$cor, 3)
 
-# Crear tabla HTML con estilo
-kable(cor_vars,
+# Aplicar código de color solo a valores mayores a |0.5|
+styled_table <- as.data.frame(cor_vars) %>%
+  mutate(across(everything(), ~ cell_spec(.x, format = "html", color = ifelse(abs(.x) > 0.5, "red", "black"), escape = FALSE)))
+
+# Crear tabla HTML con mejoras visuales
+kable(styled_table,
       format = "html",
       caption = "Tabla 4. Correlación de variables activas con los factores",
       align = "c",
@@ -692,8 +703,9 @@ kable(cor_vars,
     position = "center"
   ) %>%
   row_spec(0, bold = TRUE, background = "#f2f2f2") %>%
+  column_spec(1:ncol(cor_vars), width = "4cm", border_right = TRUE) %>%
   footnote(
-    general = "Nota: Se presentan las correlaciones de las variables originales con los componentes principales.",
+    general = "Nota: Se presentan las correlaciones de las variables originales con los componentes principales. Los valores mayores a |0.5| están resaltados en rojo.",
     escape = FALSE
   )
 ```
@@ -728,8 +740,15 @@ library(dplyr)
 # Redondear la matriz de correlaciones
 cor_illustrativas <- round(res.pca$quanti.sup$cor, 3)
 
-# Crear tabla en HTML con estilo
-kable(cor_illustrativas,
+# Aplicar código de color solo a valores mayores a |0.5|
+format_table <- as.data.frame(cor_illustrativas)
+
+# Aplicar formato a los valores directamente en la tabla
+styled_table <- format_table %>%
+  mutate(across(everything(), ~ cell_spec(.x, format = "html", color = ifelse(abs(.x) > 0.5, "red", "black"), escape = FALSE)))
+
+# Crear tabla en HTML con mejoras visuales
+kable(styled_table,
       format = "html",
       caption = "Tabla 5. Correlación de variables ilustrativas con los factores",
       align = "c",
@@ -741,11 +760,11 @@ kable(cor_illustrativas,
     position = "center"
   ) %>%
   row_spec(0, bold = TRUE, background = "#f2f2f2") %>%
+  column_spec(1:ncol(format_table), width = "4cm", border_right = TRUE) %>%
   footnote(
-    general = "Nota: Se presentan las correlaciones entre variables ilustrativas (cuantitativas suplementarias) y los componentes principales.",
+    general = "Nota: Se presentan las correlaciones entre variables ilustrativas (cuantitativas suplementarias) y los componentes principales. Los valores mayores a |0.5| están resaltados en rojo.",
     escape = FALSE
   )
-
 ```
 
 ---
@@ -841,7 +860,7 @@ library(dplyr)
 # Redondear los valores propios y varianzas
 vp <- round(pcaRHINTce$eig, 4)
 
-# Crear tabla en HTML
+# Crear tabla en HTML con mejoras visuales
 kable(vp,
       format = "html",
       caption = "Tabla 6. Valores propios, porcentaje de varianza y varianza acumulada",
@@ -854,7 +873,12 @@ kable(vp,
     full_width = FALSE,
     position = "center"
   ) %>%
-  row_spec(0, bold = TRUE, background = "#f2f2f2")
+  row_spec(0, bold = TRUE, background = "#f2f2f2") %>%
+  column_spec(1:ncol(vp), width = "4cm", border_right = TRUE) %>%
+  footnote(
+    general = "Nota: Se presentan los valores propios y porcentajes de varianza explicada.",
+    escape = FALSE
+  )
 
 ```
 
@@ -880,21 +904,31 @@ library(dplyr)
 # Redondear correlaciones a 4 decimales y seleccionar primeras 6 dimensiones
 cor_var_fac <- round(pcaRHINTce$var$cor[, 1:6], 4)
 
-# Crear tabla HTML con estilo
-kable(
-  cor_var_fac,
-  format = "html",
-  caption = "Tabla 7. Correlaciones entre variables y las primeras 6 dimensiones",
-  align = "c",
-  escape = FALSE
-) %>%
+# Aplicar código de color solo a valores mayores a |0.5|
+styled_table <- as.data.frame(cor_var_fac) %>%
+  mutate(across(everything(), ~ cell_spec(.x, format = "html",
+                                          color = ifelse(.x > 0.5, "green",
+                                                         ifelse(.x < -0.5, "red", "black")),
+                                          escape = FALSE)))
+
+# Crear tabla en HTML con mejoras visuales
+kable(styled_table,
+      format = "html",
+      caption = "Tabla 7. Correlaciones entre variables y las primeras 6 dimensiones",
+      align = "c",
+      escape = FALSE) %>%
   kable_styling(
     bootstrap_options = c("striped", "hover", "condensed", "responsive"),
     font_size = 12,
     full_width = FALSE,
     position = "center"
   ) %>%
-  row_spec(0, bold = TRUE, background = "#f2f2f2")
+  row_spec(0, bold = TRUE, background = "#f2f2f2") %>%
+  column_spec(1:ncol(cor_var_fac), width = "4cm", border_right = TRUE) %>%
+  footnote(
+    general = "Nota: Se presentan las correlaciones entre variables y los componentes principales. Los valores mayores a 0.5 están en verde y los menores a -0.5 en rojo.",
+    escape = FALSE
+  )
 
 ```
 
@@ -1374,9 +1408,12 @@ kable(var_results,
     full_width = FALSE,
     position = "center"
   ) %>%
-  row_spec(0, bold = TRUE, background = "#f2f2f2")
-
-
+  row_spec(0, bold = TRUE, background = "#f2f2f2") %>%
+  column_spec(1:ncol(var_results), width = "4cm", border_right = TRUE) %>%
+  footnote(
+    general = "Nota: Se presentan las coordenadas, contribución y calidad de representación de cada variable en las primeras dos dimensiones.",
+    escape = FALSE
+  )
 ```
 
 ---
@@ -1415,7 +1452,7 @@ var_results <- data.frame(
   Cos2_Dim4 = var_cos2[, 4]
 )
 
-# Generar tabla HTML
+# Crear tabla HTML estilizada
 kable(var_results,
       format = "html",
       caption = "Tabla 9. Resultados del PCA: Coordenadas, Contribución y Calidad de Representación (Dimensiones 3 y 4)",
@@ -1427,8 +1464,13 @@ kable(var_results,
     full_width = FALSE,
     position = "center"
   ) %>%
-  row_spec(0, bold = TRUE, background = "#f2f2f2")
-
+  row_spec(0, bold = TRUE, background = "#f2f2f2") %>%
+  row_spec(1:nrow(var_results), background = ifelse(seq_len(nrow(var_results)) %% 2 == 0, "#e6f7ff", "#ffffff")) %>%
+  column_spec(1:ncol(var_results), width = "4cm", border_right = TRUE) %>%
+  footnote(
+    general = "Nota: Se presentan las coordenadas, contribución y calidad de representación de cada variable en las dimensiones 3 y 4.",
+    escape = FALSE
+  )
 ```
 
 ---
@@ -1465,7 +1507,7 @@ var_results <- data.frame(
   Cos2_Dim6 = var_cos2[, 6]
 )
 
-# Generar tabla HTML
+# Crear tabla HTML estilizada
 kable(var_results,
       format = "html",
       caption = "Tabla 10. Resultados del PCA: Coordenadas, Contribución y Calidad de Representación (Dimensiones 5 y 6)",
@@ -1477,8 +1519,14 @@ kable(var_results,
     full_width = FALSE,
     position = "center"
   ) %>%
-  row_spec(0, bold = TRUE, background = "#f2f2f2")
-
+  row_spec(0, bold = TRUE, background = "#f2f2f2") %>%
+  row_spec(1:nrow(var_results), background = ifelse(seq_len(nrow(var_results)) %% 2 == 0, "#e6f7ff", "#ffffff")) %>%
+  column_spec(1, bold = TRUE, border_right = TRUE) %>%
+  column_spec(2:ncol(var_results), width = "4cm") %>%
+  footnote(
+    general = "Nota: Se presentan las coordenadas, contribución y calidad de representación de cada variable en las dimensiones 5 y 6.",
+    escape = FALSE
+  )
 ```
 
 ---
@@ -1497,49 +1545,70 @@ kable(var_results,
 
 ### Comparacion de los 3 ACP
 
-\vspace{-0.5em}
+
 ```{r comparativa_html, echo=FALSE, warning=FALSE}
 library(kableExtra)
 library(dplyr)
 
-# Extraer y preparar datos
-varianza1 <- as.data.frame(PCAtodas$eig[1:7, ]) %>% 
-  mutate(ACP = "ACP 1", Componente = paste("Comp", 1:7))
+# Preparar los datos
+varianza1 <- as.data.frame(PCAtodas$eig[1:8, ]) %>% 
+  mutate(ACP = "ACP 1", Componente = paste("Comp", 1:8))
 
-varianza2 <- as.data.frame(res.pca$eig) %>% 
-  mutate(ACP = "ACP 2", Componente = paste("Comp", 1:5))
+varianza2 <- as.data.frame(res.pca$eig[1:3, ]) %>% 
+  mutate(ACP = "ACP 2", Componente = paste("Comp", 1:3))
 
-varianza3 <- as.data.frame(pcaRHINTce$eig) %>% 
-  mutate(ACP = "ACP 3", Componente = paste("Comp", 1:14))
+varianza3 <- as.data.frame(pcaRHINTce$eig[1:8, ]) %>% 
+  mutate(ACP = "ACP 3", Componente = paste("Comp", 1:8))
 
-# Combinar todos los datos
+# Combinar todo
 comparativa_varianza <- bind_rows(varianza1, varianza2, varianza3) %>% 
-  select(ACP, Componente, 
-         `Valor propio` = eigenvalue, 
-         `% Varianza` = `percentage of variance`,
-         `% Acumulado` = `cumulative percentage of variance`) %>%
-  mutate(across(where(is.numeric), round, 2))  # Redondear columnas numéricas
+  mutate(across(where(is.numeric), round, 2))  # Redondear
 
-# Crear tabla HTML
-kable(comparativa_varianza,
-      format = "html",
-      caption = "Tabla 11. Comparativa de varianza explicada entre los tres ACP",
-      align = "c",
-      escape = FALSE) %>%
+# Guardar ACP para usar en group_rows() y resaltado, pero no pasarlo a la tabla
+grupos <- comparativa_varianza$ACP
+
+# Seleccionar columnas a mostrar, omitiendo ACP
+comparativa_varianza <- comparativa_varianza %>%
+  select(-ACP) %>%
+  select(Componente, eigenvalue, `percentage of variance`, `cumulative percentage of variance`)
+
+# Cambiar nombres para la tabla
+names(comparativa_varianza) <- c("Componente", "Valor propio", "% Varianza", "% Acumulado")
+
+# Crear tabla
+tabla <- kable(comparativa_varianza,
+               format = "html",
+               caption = "Tabla 11. Comparativa de varianza explicada entre los tres ACP",
+               align = "c",
+               escape = FALSE,
+               rownames = FALSE) %>%
   kable_styling(
     bootstrap_options = c("striped", "hover", "condensed", "responsive"),
     font_size = 11,
     full_width = FALSE,
     position = "center"
   ) %>%
-  group_rows("ACP 1", 1, 7) %>%
-  group_rows("ACP 2", 8, 8 + nrow(varianza2) - 1) %>%
-  group_rows("ACP 3", 8 + nrow(varianza2), 7 + nrow(varianza2) + nrow(varianza3)) %>%
+  group_rows("ACP 1", 1, 8, background = "#e6f7ff") %>%
+  group_rows("ACP 2", 9, 11, background = "#f9e6ff") %>%
+  group_rows("ACP 3", 12, 19, background = "#e6ffe6") %>%
   footnote(
     general = "Comparación de la varianza explicada por componentes principales en tres análisis diferentes.",
     number = paste("Fecha:", format(Sys.Date(), "%d/%m/%Y")),
     escape = FALSE
   )
+
+# Resaltar máximos % Varianza por grupo
+indices_max_var <- comparativa_varianza %>%
+  mutate(ACP = grupos) %>%
+  group_by(ACP) %>%
+  filter(`% Varianza` == max(`% Varianza`)) %>%
+  ungroup() %>%
+  mutate(row_num = row_number()) %>%
+  pull(row_num)
+
+
+tabla
+
 
 ```
 
