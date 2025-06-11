@@ -1,26 +1,29 @@
 ---
-title: "Lab ACP"
+title: "Lab 2 Análisis de componentes Pricipales (ACP)"
 date: "2025-05-18"
-output: 
+output:
   html_document:
     theme: cerulean
-    highlight: "pygments"
+    highlight: pygments
     fig_width: 6.5
     fig_height: 4
     toc: true
     toc_float: true
-    code_folding: "hide"
-    df_print: "kable"    
+    code_folding: hide
+    df_print: kable
   beamer_presentation:
-    theme: "Madrid"
-    colortheme: "spruce"
-    fonttheme: "structurebold"
+    theme: Madrid
+    colortheme: spruce
+    fonttheme: structurebold
     latex_engine: xelatex
     slide_level: 2
     fig_width: 6.5
     fig_height: 4
-    dev: "cairo_pdf"
+    dev: cairo_pdf
     keep_tex: true
+  pdf_document:
+    toc: true
+always_allow_html: true
 ---
 
 ```{r setup, include=FALSE, warning=FALSE}
@@ -44,7 +47,6 @@ library(kableExtra)
 - Fredy Urrea
 - Sergio Velasquez
 - Manuel Espitia
-
 
 ---
 
@@ -85,12 +87,9 @@ colnames(RHINTce) <- colnames(RHINT)[2:20]
 rownames(RHINTce) <- RHINT$CIUDADES
 ```
 
-Hacemos el PCA de nuestros datos con todas las variables que nos toca en
-nuestro grupo 6 (RH+INT) y observamos nuestros datos con el circulo
-unitario con las dos componentes que capturan mayor varianza de nuestros
-datos.
+Realizamos el análisis de componentes principales (PCA) sobre nuestros datos, utilizando todas las variables asignadas al grupo 6 (RH+INT). A partir de este análisis, visualizamos los datos en el círculo unitario, destacando las dos componentes principales que capturan la mayor varianza.
 
----
+#### Ejecucion del análisis
 
 \vspace{0em}
 ```{r pressure2, warning=FALSE}
@@ -99,7 +98,6 @@ PCAtodas<-PCA(RHINT[,2:20],scale.unit = T, ncp=7, graph = F)
 ```
 
 
----
 
 #### Selección de Componentes Principales:
 
@@ -120,8 +118,6 @@ Varianza explicada:
 Total acumulado (3 primeros): 54.8%
 
 
-
----
 
 ### Tabla de varianza explicada
 
@@ -152,7 +148,7 @@ kable(tabla_varianza,
   row_spec(1:nrow(tabla_varianza), background = ifelse(seq_len(nrow(tabla_varianza)) %% 2 == 0, "#e6f7ff", "#ffffff")) %>%
   column_spec(1, bold = TRUE, border_right = TRUE, width = "4cm") %>%
   column_spec(2, color = "blue") %>%
-  column_spec(3, color = "darkgreen") %>%
+  column_spec(3, color = "green") %>%
   footnote(
     general = paste("Nota: Se presentan los primeros", nrow(tabla_varianza), 
                     "componentes principales, los cuales explican en conjunto el",
@@ -165,9 +161,7 @@ kable(tabla_varianza,
 
 ```
 
----
 
-\scriptsize
 ##### Componente 1 (22.96% varianza):
 
 - Variables: Población (0.54), Tasa de Ocupación (0.45), Analfabetismo (0.49).
@@ -194,12 +188,10 @@ kable(tabla_varianza,
 
 - Correlaciones >0.7 en componentes 2 y 3 permiten simplificar el modelo sin pérdida crítica de información.
 
----
 
 ### Tabla de correlaciones variables componentes
 
-\vspace{-1em}
-\scriptsize
+
 ```{r corr_table_html, echo=FALSE, message=FALSE, warning=FALSE}
 library(kableExtra)
 library(dplyr)
@@ -213,7 +205,7 @@ color_cor <- function(x) {
   cell_spec(x, "html",
     bold = abs(x) > 0.5,
     color = case_when(
-      x > 0.5 ~ "darkgreen",
+      x > 0.5 ~ "green",
       x < -0.5 ~ "red",
       TRUE ~ "gray"
     )
@@ -242,7 +234,6 @@ kable(cor_data %>% mutate(across(everything(), color_cor)),
 ```
 
 
----
 
 ##### Dimensión 1 (X) - Eje principal
 - Variables clave: MP (0.94), PC (0.94)
@@ -255,7 +246,6 @@ kable(cor_data %>% mutate(across(everything(), color_cor)),
 ##### Hallazgo crítico:
 - El desarrollo económico (X) no garantiza mejoras en indicadores sociales (Y), requiriendo políticas diferenciadas.
 
----
 
 ```{r grafico_var_dim12, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.width=10, fig.height=6, fig.cap="Gráfico de variables (Dim.1 vs Dim.2) - Análisis PCA"}
 # Gráfico de variables para Dim.1 vs Dim.2 (optimizado)
@@ -275,9 +265,7 @@ fviz_pca_var(PCAtodas,
   ) 
 ```
 
----
 
-\scriptsize
 ##### Dimensión 1 (Estructural):
 - Variables clave: Población, Crecimiento poblacional, Homicidios, Balanza comercial/PIB
 - Interpretación: Eje económico-demográfico dominante (mayor varianza explicada)
@@ -291,7 +279,6 @@ fviz_pca_var(PCAtodas,
 - Contraste fundamental: Desarrollo económico (Dim.1) ≠ Mejora en seguridad/salud (Dim.3)
 - Implica necesidad de políticas diferenciadas para cada dimensión
 
----
 
 
 ```{r graficos_dim13_variables, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.width=10, fig.height=6}
@@ -311,9 +298,7 @@ fviz_pca_var(PCAtodas,
   theme(plot.title = element_text(hjust = 0.5, face = "bold"))  # Título centrado y en negrita
 ```
 
----
 
-\scriptsize
 ##### Dimensión 2 (Educación/Comercio):
 - Variables clave:
 
@@ -339,7 +324,6 @@ fviz_pca_var(PCAtodas,
 ##### Hallazgo clave:
 - Las dimensiones revelan que avances educativos/económicos no garantizan mejoras en seguridad/salud, exigiendo intervenciones específicas para cada ámbito.
 
----
 
 ```{r PCA-Dim1-vs-Dim3, echo=FALSE, message=FALSE, warning=FALSE}
 # Cargar paquetes necesarios
@@ -368,9 +352,6 @@ grafico_ind_dim13 <- fviz_pca_ind(PCAtodas,
 grid.arrange(grafico_var_dim13, grafico_ind_dim13, nrow = 1)
 ```
 
----
-
-\scriptsize
 ##### Dimensión 2 (Educación-Comercio):
 
 - Separa claramente:
@@ -403,15 +384,11 @@ grid.arrange(grafico_var_dim13, grafico_ind_dim13, nrow = 1)
 
   - Desarrollo económico ≠ Solución automática a problemáticas sociales
 
----
 
 ```{r biplot}
 fviz_pca_biplot(PCAtodas)
 ```
 
----
-
-\scriptsize
 ##### Varianza explicada:
 
 - Dim.1: 23% (desarrollo económico)
@@ -441,8 +418,7 @@ fviz_pca_biplot(PCAtodas)
     - Mortalidad infantil (MI)
 
     - Crecimiento poblacional (TCP)
-
----    
+    
 
 ##### Posiciones intermedias
 
@@ -463,9 +439,7 @@ fviz_pca_biplot(PCAtodas)
   - Oportunidades para políticas públicas diferenciadas
 
 
----
 
-\scriptsize
 ```{r biplotcol, echo=FALSE}
 fviz_pca_biplot(PCAtodas, 
                 axes = c(1, 3),  # Dim.1 (X) vs Dim.3 (Y)
@@ -474,9 +448,7 @@ fviz_pca_biplot(PCAtodas,
                 title = "Biplot PCA: Dim.1 vs Dim.3")
 ```
 
----
 
-\scriptsize
 ##### Varianza explicada:
 
   - Dim.1: 23% (desarrollo urbano-educativo)
@@ -499,9 +471,7 @@ fviz_pca_biplot(PCAtodas,
 ##### Ciudades destacadas: 
 - Bogotá (3), Cali (5), Medellín (7)
 
----
 
-\scriptsize
 ##### Variables críticas:
 
 - Analfabetismo (AA)
@@ -526,9 +496,7 @@ fviz_pca_biplot(PCAtodas,
 - Revela problemas estructurales en educación y seguridad
 - Identifica patrones únicos en ciudades intermedias
 
----
 
-\scriptsize
 ```{r setup 1, echo=FALSE}
 fviz_pca_biplot(PCAtodas, 
                 axes = c(2, 3),  # Dim.2 (X) vs Dim.3 (Y)
@@ -537,9 +505,7 @@ fviz_pca_biplot(PCAtodas,
                 title = "Biplot PCA: Dim.2 vs Dim.3")
 ```
 
----
 
-\scriptsize
 ##### Cuadrante superior derecho
  
 - Variables críticas:
@@ -559,9 +525,7 @@ fviz_pca_biplot(PCAtodas,
 
 - Interpretación: Polos de desarrollo económico
 
----
 
-\scriptsize
 ##### Lado izquierdo
 
 - Variables mixtas:
@@ -581,29 +545,27 @@ fviz_pca_biplot(PCAtodas,
 ---
 
 ## Punto 2
-Utilizar la función PCA del paquete FactoMiner para realizar un ACO con todas las varibales especificas del grupo utilizando cmo ilustrativas las variables de Recursos Humanos.
+Utilizar la función PCA del paquete FactoMiner para realizar un ACP con todas las varibales especificas del grupo utilizando cOmo ilustrativas las variables de Recursos Humanos.
 
 
 ### Preparación de datos
 
 Seleccionamos las variables activas (internacionalización) y las variables ilustrativas (recursos humanos).
 
-\vspace{-1em}
-\scriptsize
+
 ```{r}
 base_acp <- RHINT[, c("BCPIB", "CI", "TOE", "DP", "DM", 
                       "PC", "TCP", "AA", "CBPS", "CBES", "RAP", "CC", 
                       "CPT", "CS", "MI", "DCFS", "VI", "H", "S")]
 ```
 
-### Análisis de Componentes Principales (ACP)
-\vspace{-1em}
-\scriptsize
+### Ejecución Análisis de Componentes Principales (ACP)
+
+
 ```{r}
 res.pca <- PCA(base_acp, scale.unit = TRUE, quanti.sup = 6:19, graph = FALSE)
 ```
 
----
 
 ### Resultados
 
@@ -634,7 +596,7 @@ kable(eig.val,
   row_spec(1:nrow(eig.val), background = ifelse(seq_len(nrow(eig.val)) %% 2 == 0, "#e6f7ff", "#ffffff")) %>%
   column_spec(1, bold = TRUE, border_right = TRUE) %>%
   column_spec(2, color = "blue") %>%
-  column_spec(3, color = "darkgreen") %>%
+  column_spec(3, color = "green") %>%
   footnote(
     general = paste("Nota: La tabla muestra la importancia relativa de cada componente principal."),
     escape = FALSE
@@ -642,9 +604,7 @@ kable(eig.val,
 
 ```
 
----
 
-\scriptsize
 ##### Dimensión 1 - Apertura Internacional (62.2%)
 - Eje de competitividad global
 
@@ -674,11 +634,10 @@ kable(eig.val,
 
 - Riesgo de sostenibilidad a largo plazo
 
----
+
 
 #### b) Correlaciones de variables activas
-\vspace{0em}
-\scriptsize
+
 ```{r cor_activa_html, echo=FALSE, message=FALSE, warning=FALSE}
 library(kableExtra)
 library(dplyr)
@@ -710,7 +669,7 @@ kable(styled_table,
   )
 ```
 
----
+
 
 ##### Polo Positivo (Ciudades Globalizadas):
 - Mayor población y mejor cobertura educativa (primaria a superior)
@@ -728,7 +687,6 @@ Las ciudades con mayor apertura global muestran:
 - Pero enfrentan desafíos en salud pública y violencia
 - Las menos globalizadas tienen crecimiento poblacional sin desarrollo educativo equivalente
 
----
 
 #### c) Correlaciones de variables ilustrativas
 \vspace{-1em}
@@ -767,9 +725,7 @@ kable(styled_table,
   )
 ```
 
----
 
-\scriptsize
 ##### Dimensión 1 (62,2 % de la varianza)
 - Relaciona apertura internacional con mejores condiciones sociales.
 
@@ -784,9 +740,7 @@ kable(styled_table,
 
 - Negativas: mayor analfabetismo, crecimiento poblacional y mortalidad infantil en contextos con menor desarrollo educativo.
 
----
 
-\scriptsize
 ### Visualizaciones
 #### a) Mapa de variables
 
@@ -797,9 +751,8 @@ fviz_pca_var(res.pca, col.var = "cos2",
              repel = TRUE, title = "Variables activas e ilustrativas")
 ```
 
----
 
-### b) Biplot
+#### b) Biplot
 
 ```{r}
 fviz_pca_biplot(res.pca, repel = TRUE, 
@@ -807,9 +760,7 @@ fviz_pca_biplot(res.pca, repel = TRUE,
                 title = "Biplot: ciudades y variables")
 ```
 
----
 
-\scriptsize
 ##### Distribución de ciudades en el plano factorial
 
 Las ciudades se agrupan según dos ejes: apertura internacional y desarrollo social y educativo.
@@ -831,8 +782,7 @@ Utilizar la funcion PCA del paquete FactoMiner para realizar un ACP de las varia
 
 ### Carga de archivos  y ejecucion del ACP
 
-\vspace{-1em}
-\scriptsize
+
 ```{r pressure, results='hide', warning=FALSE, message=FALSE}
 
 # Estandrizacion y asiganacion de nombres de la filas
@@ -848,7 +798,6 @@ pcaRHINTce <- PCA(RHINTce, quanti.sup = c(15:19), graph = F, ncp = 6)
 
 ```
 
----
 
 ### Valores propios y varianza explicada
 \vspace{-0.5em}
@@ -890,13 +839,11 @@ kable(vp,
 - 2 componentes (41.5% varianza) permiten análisis bidimensional básico
 - 90% varianza requiere 8 componentes (complejidad multidimensional)
 - Conclusión: Reducción dimensional efectiva, pero se requieren múltiples componentes para capturar la complejidad de los datos.
-   
----
+
 
 
 ### Correlaciones variable factor
-\vspace{-0.5em}
-\tiny
+
 ```{r correlaciones_variable_factor_html, echo=FALSE, warning=FALSE, results='asis'}
 library(kableExtra)
 library(dplyr)
@@ -939,14 +886,13 @@ kable(styled_table,
 - D3: Violencia género (Delitos 0.77, VIF 0.80)
 - D5-D6: Salud y violencia vinculadas
 
----
+
 
 ### Variables y objetos graficados en distintas dimensiones
 
 #### Variables y ciudades en las Dimensiones 1 y 2
 
-\vspace{0em}
-\tiny
+
 ```{r gravardim12, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Figura 1. Variables y ciudades en las Dimensiones 1 y 2", out.width='90%', fig.align='center'}
 library(factoextra)
 library(gridExtra)
@@ -980,22 +926,19 @@ combined_plot <- gridExtra::arrangeGrob(bipl1, bipl2, nrow = 1)
 grid::grid.draw(combined_plot)
 ```
 
----
 
 ##### Análisis de Ciudades y Variables (Dimensiones 1 y 2 - 41.5% varianza total)
 
-- Eje X (25.5%): Educación↑ vs Secuestros↑ → Bogotá/Medellín vs Cúcuta
-- Eje Y (16%): Violencia↑ vs Educación↓ → Villavicencio/Santa Marta vs Armenia
+- Eje X (25.5%): Destacan Analfabetismos absoluto y relacion alumno profesor → Rioacha
+- Eje Y (16%): Destaca CBES Y DM en ciudades como Bogota y Medellin
 - Disparidad regional: Bogotá/Medellín vs. Cúcuta/San Andrés en desarrollo y seguridad
 - Relación educación-mercados: CBES y DM correlacionan en ciudades desarrolladas
-- Variables suplementarias: BCPIB y DM ayudan a contextualizar los ejes principales
+- Variables suplementarias: DM ayudan a contextualizar los ejes principales
 
----
+
 
 #### Variables y ciudades en las Dimensiones 1 y 3
 
-\vspace{0em}
-\tiny
 
 ```{r grafvarobjdim13, echo=FALSE, message=FALSE, warning=FALSE, results='asis',fig.cap="Figura 1.1 Variables y ciudades en las Dimensiones 1 y 3"}
 # Cargar librerías
@@ -1036,22 +979,18 @@ grid::grid.draw(combined_plot)
 
 ```
 
----
 
 ##### Análisis Ciudades-Variables (Dim 1 y 3 - 40.3% varianza)
 
-- Eje X: Crecimiento (AA/TCP) vs Educación (CC/CBES)
+- Eje X: Crecimiento (AA
 
-- Eje Y: Violencia familiar (VI/DCFS) vs Seguridad (CS/S)
+- Eje Y: Violencia familiar (VI/DCFS)
 
 Ciudades con alto crecimiento muestran dos patrones:
 
 - Con alta violencia (Villavicencio)
-- Con baja violencia (Riohacha)
-- Infraestructura educativa se asocia con menor violencia específica
-- Variables suplementarias (DM/PC) validan vínculo entre diversificación económica y desarrollo
 
----
+
 
 #### Variables y ciudades en las Dimensiones 3 y 4
 
@@ -1094,26 +1033,20 @@ grid::grid.draw(combined_plot)
 
 ```
 
----
+
 
 ##### Análisis Ciudades-Variables (Dim 3 y 4 - 26.2% varianza)
 
 - Eje Y (D3): Violencia (VI/DCFS) vs Educación básica (CBPS)
 
-- Eje X (D4): Secuestros/Salud vs Homicidios/Capacitación
 
-- Paradoja educativa: Alta cobertura escolar (CBPS) coexiste con violencia familiar/sexual (VI/DCFS)
 
 Dos modelos de seguridad:
 
 - Ciudades con violencia doméstica (Villavicencio)
 
-- Ciudades con secuestros pero baja violencia familiar (Bogotá)
+- Formación laboral crítica: Baja capacitación (CPT)
 
-- Formación laboral crítica: Baja capacitación (CPT) vinculada a homicidios (H) en ciudades como Cúcuta
-
-
----
 
 #### Variables y ciudades en las Dimensiones 5 y 6
 
@@ -1152,31 +1085,20 @@ print(combined_plot)
 
 ```
 
----
 
 ##### Análisis Dimensiones 5 y 6 (17.5% varianza total)
 
-- Paradoja capitalina: Bogotá combina altos índices violentos con fuerte capacitación laboral
+- Paradoja capitalina: Bogotá tiene bajos indices de CS
 
 Dos modelos exitosos:
 
-- Ciudades con servicios consolidados (Pasto/Medellín)
-
-- Ciudades con apuesta educativa (Montería/San Andrès)
-
-- Foco crítico: Cúcuta/Cali requieren urgentes mejoras en cobertura sanitaria
+- Ciudades con servicios consolidados Pasto
 
 - Dim5: Salud vs Violencia (H/MI)
 
-- Dim6: Formación laboral + Vulnerabilidades
+-  Pasto: Modelo a replicar (CS)
 
-- Bogotá: Violencia + Capacitación
 
-- Cúcuta/Cali: Urgen mejoras en salud
-
--  Pasto/Medellín: Modelo a replicar
-
----
 
 ### Biplots
 
@@ -1202,26 +1124,24 @@ print(
 )
 ```
 
----
 
 ##### Biplot Dimensiones 1 y 2
 El biplot (41.5% varianza total) revela contrastes socioeconómicos entre ciudades:
 
 - Dimensión 1 (25.5%): Seguridad vs. Desarrollo
 
-  - (+) Riohacha/Valledupar: altos Homicidios (H) y Mortalidad Infantil (MI)
+  - (+) Riohacha: altos indices de Analfabetismos (AA) y (TC)
 
-  - (-) Bogotá/Medellín: mejor Cobertura Salud (CS) y Educación Superior (CBES)
+  - (-) Bogotá: mejor Cobertura en educacion (CBES) y Educación (CC)
 
 - Dimensión 2 (16%): Excelencia educativa
 
-  - (+) Bogotá/Medellín: destacan en Calidad Colegios (CC) y CBES
+  - (+) Bogotá destacan en Calidad Colegios (CC) y CBES
 
   - (-) San Andrés/Ibagué: menores indicadores educativos
 
 - Variables suplementarias (internacionalización) correlacionan levemente con ciudades desarrolladas.
 
----
 
 #### Biplot en las Dimensiones 1 y 3
 
@@ -1246,21 +1166,20 @@ fviz_pca_biplot(pcaRHINTce,
   theme(legend.position = "right")
 ```
 
----
+
 
 ##### Biplot Dimensiones 1 y 3
 
 
-\scriptsize
+
 - Ejes principales (40.3% varianza total):
 
-- Dimensión 1 (25.5%): Contrasta dinamismo demográfico (TCP, AA) con calidad educativa (CC, CBES). Ciudades como Villavicencio muestran alto crecimiento pero desafíos en alfabetización, mientras Bogotá y Pasto destacan por su infraestructura formativa.
+- Dimensión 1 (25.5%): Contrasta dinamismo demográfico (TCP, AA) con calidad educativa (CC, CBES).
 
-- Dimensión 3 (14.8%): Revela una tensión entre violencia (VI, DCFS) y escolarización básica (CBPS), con ciudades como Bucaramanga combinando buena cobertura educativa con focos de violencia doméstica.
+- Dimensión 3 (14.8%): Revela una tensión entre violencia (VI, DCFS) y escolarización básica (CBPS), con ciudades como Villavicencio.
 
 - Hallazgos clave:
 
-  - Cuatro perfiles urbanos identificados: desde ciudades con crecimiento acelerado y violencia (Villavicencio) hasta aquellas con educación sólida y baja criminalidad (Bogotá).
 
   - Variables como Cobertura en Salud (CS) y Secuestros (S) requieren análisis en otras dimensiones para su plena interpretación.
 
@@ -1268,7 +1187,6 @@ fviz_pca_biplot(pcaRHINTce,
 
 - Conclusión: Este plano destaca la necesidad de políticas que equilibren crecimiento poblacional, calidad educativa y seguridad, invitando a profundizar en dimensiones adicionales para un diagnóstico integral.
 
----
 
 #### Biplot en las Dimensiones 3 y 4
 
@@ -1293,7 +1211,6 @@ fviz_pca_biplot(pcaRHINTce,
   theme(legend.position = "right")
 ```
 
----
 
 ##### Biplot Dimensiones 3 y 4
 
@@ -1303,26 +1220,11 @@ fviz_pca_biplot(pcaRHINTce,
 
   - Enfoque: Violencia intrafamiliar (VI) y delitos sexuales (DCFS)
 
-  - Ciudades críticas: Bucaramanga (alta incidencia)
-
-  - Ciudades destacadas: Armenia, Cartago y Manizales (baja incidencia + buena cobertura educativa CBPS)
-
-- Dimensión 4 (11.4%):
-
-. Variables económicas: BCPIB y TCP con influencia moderada
-
-- Caso atípico: Villavicencio (dinámicas no explicadas por estas dimensiones)
-
-- Conclusiones:
-
-  - Patrones claros de violencia de género vs. desempeño educativo
-
-  - Oportunidad para políticas focalizadas en seguridad ciudadana y equidad educativa
+  - Ciudades críticas: Vilavicencio (alta incidencia)
 
   - Necesidad de análisis adicional para casos atípicos
 
 
----
 
 #### Biplot en las Dimensiones 5 y 6
 
@@ -1347,7 +1249,6 @@ fviz_pca_biplot(pcaRHINTce,
   theme(legend.position = "right")
 ```
 
----
 
 ##### Biplot Dimensiones 5 y 6
 
@@ -1358,24 +1259,13 @@ fviz_pca_biplot(pcaRHINTce,
 
   - Ciudades críticas: Riohacha, Pereira, Cúcuta (alta violencia letal)
 
-- Dimensión 6 (8.5%):
 
-  - Variable moderada: Secuestros (S) (impacto negativo)
 
-  - Ciudades estables: Bogotá, Ibagué, Cartago (posición neutra)
-
-- Patrón destacado:
-
-  - Ciudades con alta incidencia de homicidios se agrupan claramente
-  - Variables de bienestar (CS, CC) tienen influencia secundaria
-
----
 
 ### Cosenos cuadrados de los objetos con los factores
 
 #### Tabla Cosenos Cuadrados en la dimensiones 1 y 2 
 
-\scriptsize
 ```{r cos212_html, echo=FALSE, warning=FALSE, results='asis'}
 library(kableExtra)
 library(dplyr)
@@ -1416,7 +1306,7 @@ kable(var_results,
   )
 ```
 
----
+
 
 ##### Dimensiones 1-2
 
@@ -1426,12 +1316,10 @@ kable(var_results,
 
 - Rol: Estructuran el espacio inicial, diferenciando ciudades según desarrollo educativo y demográfico.
 
----
 
 #### Tabla Cosenos Cuadrados en la dimensiones 3 y 4 
 
 
-\scriptsize
 ```{r cos234_html, echo=FALSE, warning=FALSE, results='asis'}
 library(kableExtra)
 library(dplyr)
@@ -1473,7 +1361,6 @@ kable(var_results,
   )
 ```
 
----
 
 ##### Dimensiones 3-4
 
@@ -1483,7 +1370,6 @@ kable(var_results,
 
 - Hallazgo: Dimensiones críticas para evaluar seguridad ciudadana.
 
----
 
 #### Tabla Cosenos Cuadrados en la dimensiones 5 y 6 
 
@@ -1529,7 +1415,6 @@ kable(var_results,
   )
 ```
 
----
 
 ##### Dimensiones 5-6
 
@@ -1613,7 +1498,6 @@ tabla
 ```
 
 
----
 
 ### Varianza explicada:
 
@@ -1636,7 +1520,7 @@ tabla
 
 - Conclusión: Cada ACP revela dimensiones distintas.
 
----
+
 
 ```{r grafico_var_dim123, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.width=10, fig.height=6, fig.cap="Gráfico de variables (Dim.1 vs Dim.2) - Análisis PCA"}
 # Gráfico de variables para Dim.1 vs Dim.2 (optimizado)
@@ -1656,7 +1540,6 @@ fviz_pca_var(PCAtodas,
   ) 
 ```
 
----
 
 ```{r FFF, echo=FALSE}
 fviz_pca_var(res.pca, col.var = "cos2", 
@@ -1664,7 +1547,7 @@ fviz_pca_var(res.pca, col.var = "cos2",
              repel = TRUE, title = "Variables activas e ilustrativas")
 ```
 
----
+
 
 ```{r GGGG,echo=FALSE}
 bipl1 <- fviz_pca_var(
@@ -1680,7 +1563,7 @@ bipl1 <- fviz_pca_var(
 
 ```
 
----
+
 
 #### Posición de las ciudades:
 
@@ -1690,7 +1573,7 @@ bipl1 <- fviz_pca_var(
 
 -  Conclusión: La representación cambia según variables activas.
 
----
+
 
 #### Calidad de representación (cos²):
 
@@ -1701,7 +1584,7 @@ bipl1 <- fviz_pca_var(
 - Conclusión: ACP 2 es el más claro gráficamente.
 
 
----
+
 
 #### Interpretación final:
 
