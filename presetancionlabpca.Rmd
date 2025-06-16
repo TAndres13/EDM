@@ -164,7 +164,7 @@ kable(tabla_varianza,
 
 ##### Componente 1 (22.96% varianza):
 
-- Variables: Población (0.54), Tasa de Ocupación (0.45), Analfabetismo (0.49).
+- Variables: Población (0.67), Tasa de Ocupación (-0.62), Analfabetismo (-0.6).
 
 - Interpretación: Eje de desarrollo urbano y acceso a servicios básicos.
 
