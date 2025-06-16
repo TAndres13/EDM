@@ -1426,100 +1426,112 @@ kable(var_results,
 
 ---
 
-## Punto 4
+## Punto 4 
 
-### Comparacion de los 3 ACP
+---
 
+### Objetivo y enfoque de cada análisis
 
-```{r comparativa_html, echo=FALSE, warning=FALSE}
-library(kableExtra)
+| Análisis | Variables **activas** | Variables **ilustrativas** | Propósito |
+| ---------| ---------------------| ---------------------------| -----------|
+| **ACP 1**| Todas (INT + RH)     | –                          | Visión integral |
+| **ACP 2**| Internacionalización / economía | Recursos Humanos | Apertura internacional |
+| **ACP 3**| Recursos Humanos     | Internacionalización       | Desigualdad + violencia |
+
+---
+
+### Comparación completa de varianza
+
+```{r comparativa_acp, echo = FALSE, message = FALSE, warning = FALSE}
+# Datos de eigenvalues ya cargados arriba
 library(dplyr)
+library(kableExtra)
 
-# Preparar los datos
-varianza1 <- as.data.frame(PCAtodas$eig[1:8, ]) %>% 
-  mutate(ACP = "ACP 1", Componente = paste("Comp", 1:8))
+var1 <- as.data.frame(PCAtodas$eig[1:7, ]) |>
+  mutate(ACP = "ACP 1", Componente = paste("Comp", 1:7))
 
-varianza2 <- as.data.frame(res.pca$eig[1:3, ]) %>% 
-  mutate(ACP = "ACP 2", Componente = paste("Comp", 1:3))
+var2 <- as.data.frame(res.pca$eig) |>
+  mutate(ACP = "ACP 2", Componente = paste("Comp", 1:5))
 
-varianza3 <- as.data.frame(pcaRHINTce$eig[1:8, ]) %>% 
-  mutate(ACP = "ACP 3", Componente = paste("Comp", 1:8))
+var3 <- as.data.frame(pcaRHINTce$eig) |>
+  mutate(ACP = "ACP 3", Componente = paste("Comp", 1:14))
 
-# Combinar todo
-comparativa_varianza <- bind_rows(varianza1, varianza2, varianza3) %>% 
-  mutate(across(where(is.numeric), round, 2))  # Redondear
+comparativa <- bind_rows(var1, var2, var3) |>
+  select(
+    ACP, Componente,
+    `Valor propio` = eigenvalue,
+    `% Varianza`   = `percentage of variance`,
+    `% Acumulado`  = `cumulative percentage of variance`
+  ) |>
+  mutate(across(where(is.numeric), round, 2))
 
-# Guardar ACP para usar en group_rows() y resaltado, pero no pasarlo a la tabla
-grupos <- comparativa_varianza$ACP
-
-# Seleccionar columnas a mostrar, omitiendo ACP
-comparativa_varianza <- comparativa_varianza %>%
-  select(-ACP) %>%
-  select(Componente, eigenvalue, `percentage of variance`, `cumulative percentage of variance`)
-
-# Cambiar nombres para la tabla
-names(comparativa_varianza) <- c("Componente", "Valor propio", "% Varianza", "% Acumulado")
-
-# Crear tabla
-tabla <- kable(comparativa_varianza,
-               format = "html",
-               caption = "Tabla 11. Comparativa de varianza explicada entre los tres ACP",
-               align = "c",
-               escape = FALSE,
-               rownames = FALSE) %>%
+kable(comparativa,
+      caption = "Tabla 2. Comparativa de varianza explicada entre los tres ACP",
+      align   = "c") |>
   kable_styling(
     bootstrap_options = c("striped", "hover", "condensed", "responsive"),
-    font_size = 11,
-    full_width = FALSE,
-    position = "center"
-  ) %>%
-  group_rows("ACP 1", 1, 8, background = "#e6f7ff") %>%
-  group_rows("ACP 2", 9, 11, background = "#f9e6ff") %>%
-  group_rows("ACP 3", 12, 19, background = "#e6ffe6") %>%
+    font_size  = 11,
+    full_width = FALSE
+  ) |>
+  group_rows("ACP 1", 1, 7) |>
+  group_rows("ACP 2", 8, 8 + nrow(var2) - 1) |>
+  group_rows("ACP 3", 8 + nrow(var2),
+                     7 + nrow(var2) + nrow(var3)) |>
   footnote(
-    general = "Comparación de la varianza explicada por componentes principales en tres análisis diferentes.",
-    number = paste("Fecha:", format(Sys.Date(), "%d/%m/%Y")),
-    escape = FALSE
+    general = "Comparación de la varianza explicada por componentes principales.",
+    number  = paste("Fecha:", format(Sys.Date(), "%d/%m/%Y")),
+    escape  = FALSE
   )
+```
 
-# Resaltar máximos % Varianza por grupo
-indices_max_var <- comparativa_varianza %>%
-  mutate(ACP = grupos) %>%
-  group_by(ACP) %>%
-  filter(`% Varianza` == max(`% Varianza`)) %>%
-  ungroup() %>%
-  mutate(row_num = row_number()) %>%
-  pull(row_num)
+```{r grafico_barras_varianza, echo=FALSE, message=FALSE, warning=FALSE, fig.align="center"}
+library(ggplot2)
 
+# Unificar las tres estructuras en un solo dataframe
+var_total <- bind_rows(
+  PCAtodas$eig[1:5, ] |> as.data.frame() |> mutate(ACP = "ACP 1", Dim = 1:5),
+  res.pca$eig[1:5, ]  |> as.data.frame() |> mutate(ACP = "ACP 2", Dim = 1:5),
+  pcaRHINTce$eig[1:5, ] |> as.data.frame() |> mutate(ACP = "ACP 3", Dim = 1:5)
+)
 
-tabla
-
-
+ggplot(var_total, aes(x = factor(Dim), y = `cumulative percentage of variance`, fill = ACP)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Componente", y = "% Varianza Acumulada",
+       title = "Varianza acumulada por componente") +
+  theme_minimal()
 ```
 
 
 
-### Varianza explicada:
-
-- ACP 2 explica el 85.4% con solo 2 dimensiones → más eficiente.
-
-- ACP 1 y 3 explican ~41% en dos dimensiones → necesitan más componentes.
-
-- Conclusión: ACP 2 es el más eficiente en reducción dimensional.
-
----
 
 
-#### Ejes principales:
 
-- ACP 1: mezcla de economía, población y educación.
 
-- ACP 2: apertura internacional + cobertura educativa.
+```{r n_componentes_80, echo=FALSE}
+num_comp <- function(x) which(cumsum(x[,2]) >= 80)[1]
 
-- ACP 3: desigualdad social y violencia.
+n1 <- num_comp(PCAtodas$eig)
+n2 <- num_comp(res.pca$eig)
+n3 <- num_comp(pcaRHINTce$eig)
 
-- Conclusión: Cada ACP revela dimensiones distintas.
+tabla_ncomp <- data.frame(
+  ACP = c("ACP 1", "ACP 2", "ACP 3"),
+  `# Componentes para 80%` = c(n1, n2, n3)
+)
 
+kable(tabla_ncomp,
+      caption = "Tabla 3. Nº de componentes necesarios para explicar el 80% de la varianza",
+      align = "c") |>
+  kable_styling(full_width = FALSE)
+```
+
+### Significado de los ejes
+
+| ACP   | Dim. 1                                   | Dim. 2                              |
+| ----- | ---------------------------------------- | ----------------------------------- |
+| **1** | Economía + Demografía                    | Capital humano                      |
+| **2** | Apertura internacional / diversificación | Cobertura educativa + salud         |
+| **3** | Desigualdad & violencia                  | Salud pública / mortalidad infantil |
 
 
 ```{r grafico_var_dim123, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.width=10, fig.height=6, fig.cap="Gráfico de variables (Dim.1 vs Dim.2) - Análisis PCA"}
@@ -1548,54 +1560,48 @@ fviz_pca_var(res.pca, col.var = "cos2",
 ```
 
 
+### Agrupamientos de ciudades
 
-```{r GGGG,echo=FALSE}
-bipl1 <- fviz_pca_var(
-  pcaRHINTce,
-  label = "var",
-  col.var = "cos2",
-  gradient.cols = c("blue", "orange", "red"),
-  repel = TRUE,
-  title = "A) Variables",
-  labelsize = 3
-)
+| ACP   | Ciudades **líderes**   | Ciudades **críticas** |
+| ----- | ---------------------- | --------------------- |
+| **1** | Bogotá, Medellín, Cali | Riohacha, Sincelejo   |
+| **2** | Cartago, Manizales     | Neiva                 |
+| **3** | Bucaramanga            | Villavicencio         |
 
 
-```
+### Ventajas y limitaciones
+
+| ACP   | Ventaja                     | Limitación                |
+| ----- | --------------------------- | ------------------------- |
+| **1** | Visión holística            | ≥ 6 componentes para 80 % |
+| **2** | 85 % varianza con 2 ejes    | Menor detalle social      |
+| **3** | Enfoque en brechas sociales | Solo 42 % en 2 ejes       |
 
 
+### Síntesis gráfica
+- ACP 2 forma grupos claros (Manizales, Cartago) → desempeño alto.
 
-#### Posición de las ciudades:
+- ACP 3 separa ciudades según desigualdad y violencia (Bucaramanga).
 
-- ACP 2: grupos claros → ej. Manizales y Cartago bien posicionadas.
-
-- ACP 3: segmentación social → ej. Bucaramanga con violencia.
-
--  Conclusión: La representación cambia según variables activas.
+La calidad de representación (cos²) es mayor en ACP 2 → visualización más fiable.
 
 
+### Interpretación final
+- ACP 1: panorámica general.
 
-#### Calidad de representación (cos²):
+- ACP 2: énfasis en desarrollo económico-educativo.
 
-- ACP 2 tiene mejores cos² → mejor visualización.
-
-- ACP 3: algunas variables sociales bien representadas.
-
-- Conclusión: ACP 2 es el más claro gráficamente.
+- ACP 3: revela brechas sociales.
 
 
+### Conclusiones integradas
 
+- Complementariedad – cada ACP ilumina una faceta distinta (económica, internacional y social).
 
-#### Interpretación final:
+- Eficiencia – ACP 2 es el mejor resumen 2-D.
 
-- ACP 1: general, exploratorio.
+- Profundidad social – ACP 3 revela desigualdades invisibles en análisis puramente económicos.
 
-- ACP 2: enfocado en desarrollo económico y educativo.
-
-- ACP 3: visibiliza brechas sociales.
-
-- Conclusión: Los tres ACP se complementan.
-
-
+- Política pública – integrar los hallazgos permite estrategias que combinen competitividad, capital humano y seguridad.
 
 
